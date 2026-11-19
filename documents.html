@@ -14,7 +14,7 @@
 <script>
 
 const D=window.DOCUMENT_RULES;
-const state={program:"family",marital:"single",citizenship:"rf",exception:"rf",spouse:"no",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
+const state={program:"family",marital:"single",citizenship:"rf",exception:"rf",spouse:"no",spouseCitizenship:"rf",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · часть дохода неофициальная",military:"Военнослужащий",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
@@ -25,7 +25,8 @@ function qs(){
  ];
  if(state.program==="standard")q.push({key:"citizenship",title:"Какое гражданство у заёмщика?",hint:"В источнике есть отдельный комплект для иностранного гражданина.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
  if(state.program==="family"&&state.marital==="married")q.push({key:"exception",title:"Какой статус у второго супруга?",hint:"Источник отдельно выделяет исключения для иностранного гражданина и участника НИС.",opts:[["rf","Оба супруга — граждане РФ","♡"],["foreign","Второй супруг — иностранец или участник НИС","◎"]]});
- if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли супруг(а) участвовать в заявке?",hint:"Если участвует, добавим документы супруга из актуальной таблицы.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
+ if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли супруг(а) участвовать в заявке?",hint:"Если супруг участвует, после ответа добавим его документы к списку.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
+ if(state.program==="standard"&&state.marital==="married"&&state.spouse==="yes"&&state.citizenship==="foreign")q.push({key:"spouseCitizenship",title:"Какое гражданство у супруга, участвующего в заявке?",hint:"В источнике для супруга — гражданина РФ и супруга-иностранца предусмотрены разные списки.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
  if(state.program==="family")q.push({key:"capital",title:"Материнский капитал используется в первоначальном взносе?",hint:"При использовании маткапитала потребуются дополнительные документы.",opts:[["yes","Да, используем","✓"],["no","Нет","×"]]});
  q.push({key:"job",title:"Как клиент подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите соответствующую категорию занятости.",opts:state.program==="it"?[["official","По найму · официальный доход","▤"],["partial","По найму · не весь доход официальный","▥"]]:[["official","По найму · официальный доход","▤"],["partial","По найму · не весь доход официальный","▥"],["military","Военнослужащий","☆"],["company","ООО","▦"],["ip_usn","ИП · УСН","◈"],["ip_patent","ИП · патент","◈"],["self","Самозанятый","◇"]]});
  return q;
@@ -33,7 +34,7 @@ function qs(){
 function showStep(){
  const questions=qs();state.idx=Math.min(state.idx,questions.length-1);const q=questions[state.idx];$('#result').classList.add('hidden');$('#questionnaire').classList.remove('hidden');
  $('#progress').style.width=Math.round((state.idx+1)/questions.length*100)+"%";
- $('#steps').innerHTML=questions.map((x,i)=>'<div class="navstep '+(i===state.idx?'current':i<state.idx?'past':'')+'"><span class="dot">'+(i<state.idx?'✓':i+1)+'</span><span>'+esc(x.key==="program"?"Программа":x.key==="marital"?"Семейное положение":x.key==="job"?"Занятость":x.key==="citizenship"?"Гражданство":x.key==="exception"?"Супруг":x.key==="capital"?"Маткапитал":"Участие супруга")+'</span></div>').join('');
+ $('#steps').innerHTML=questions.map((x,i)=>'<div class="navstep '+(i===state.idx?'current':i<state.idx?'past':'')+'"><span class="dot">'+(i<state.idx?'✓':i+1)+'</span><span>'+esc(x.key==="program"?"Программа":x.key==="marital"?"Семейное положение":x.key==="job"?"Занятость":x.key==="citizenship"?"Гражданство":x.key==="exception"?"Супруг":x.key==="capital"?"Маткапитал":x.key==="spouseCitizenship"?"Гражданство супруга":"Участие супруга")+'</span></div>').join('');
  const body='<div class="counter">Вопрос '+(state.idx+1)+' из '+questions.length+'</div><h2 class="questiontitle">'+esc(q.title)+'</h2><p class="questionhint">'+esc(q.hint)+'</p><div class="choices">'+q.opts.map(([val,name,icon])=>'<button class="choice '+(state[q.key]===val?'selected':'')+'" type="button" data-value="'+esc(val)+'"><span class="choiceicon">'+esc(icon)+'</span><span class="choicetext">'+esc(name)+'</span><span class="tick"></span></button>').join('')+'</div><div class="footnav"><button type="button" class="btn secondary" id="prev" '+(state.idx===0?'disabled':'')+'>← Назад</button><button type="button" class="btn" id="next">'+(state.idx===questions.length-1?'Сформировать список →':'Далее →')+'</button></div>';
  $('#questions').innerHTML=body;
  document.querySelectorAll('.choice').forEach(el=>el.onclick=()=>{state[q.key]=el.dataset.value;if(q.key==="program")state.job="official";if(q.key==="marital"&&state.marital==="single")state.spouse="no";showStep()});
@@ -43,13 +44,22 @@ function showStep(){
 function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте ввиду в дальнейшем на сделку потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
 function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim())}
 function docGroups(){
- const p=D.programs[state.program];let personal="",notes=[];
- if(state.program==="family"){personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);if(state.marital==="married")notes.push(state.exception==="rf"?p.notes.married:p.notes.exception)}
- if(state.program==="it"){personal=state.marital==="single"?p.personal.single:p.personal.married;if(state.marital==="married"){notes.push(p.notes.married);if(state.spouse==="yes")notes.push(p.notes.spouse)}}
- if(state.program==="standard"){personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);if(state.marital==="married"&&state.spouse==="yes")notes.push(state.citizenship==="foreign"?p.notes.spouseForeign:p.notes.spouseRF)}
+ const p=D.programs[state.program];let personal="";
+ // Тексты про условия участия супруга — правила опроса, а не текст клиентской памятки.
+ if(state.program==="family")personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);
+ if(state.program==="it")personal=state.marital==="single"?p.personal.single:p.personal.married;
+ if(state.program==="standard")personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);
  const a=splitSource(personal),b=splitSource(p.employment[state.job]);
  const personalDocs=lines(a.list).filter(x=>state.program!=="family"||state.capital==="yes"||!/выписка об остатке по материнскому капиталу|сертификат по материнскому капиталу/i.test(x));
- return {groups:[{title:"Личные документы",docs:personalDocs},{title:"Занятость и подтверждение дохода",docs:lines(b.list)}],notes:[...notes,a.more,b.more].filter(Boolean)};
+ const groups=[{title:"Личные документы",docs:personalDocs}];
+ if(state.marital==="married"&&state.spouse==="yes"&&state.program!=="family"){
+   const rf=["Номер телефона супруга, привязанный к Госуслугам","Паспорт супруга — все страницы, включая пустые (9 разворотов)","СНИЛС супруга","ИНН супруга"];
+   const foreign=lines(D.programs.standard.personal.foreign).map(x=>x.replace(/иностранного гражданина/i,"супруга — иностранного гражданина"));
+   const spouseDocs=state.program==="standard"&&state.citizenship==="foreign"&&state.spouseCitizenship==="foreign"?foreign:rf;
+   groups.push({title:"Документы супруга, участвующего в заявке",docs:spouseDocs});
+ }
+ groups.push({title:"Занятость и подтверждение дохода",docs:lines(b.list)});
+ return {groups,notes:[a.more,b.more].filter(Boolean)};
 }
 let current=null;
 function copyList(){let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";for(const g of current.groups){if(g.docs.length)result+=g.title+":\n"+g.docs.map(x=>"• "+x).join("\n")+"\n\n"}if(current.notes.length)result+="ВАЖНО ДЛЯ КЛИЕНТА — ДОПОЛНИТЕЛЬНЫЕ УСЛОВИЯ И ИНСТРУКЦИИ\n"+current.notes.join("\n\n")+"\n";return result.trim()}
