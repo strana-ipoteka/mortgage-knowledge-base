@@ -1,0 +1,36 @@
+name: Sync Bank Memo from Google Sheets
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 5,11 * * 1-5'
+permissions:
+  contents: write
+concurrency:
+  group: sync-bank-memo
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dependencies
+        run: python -m pip install --disable-pip-version-check google-auth requests
+      - name: Refresh memo-data.js
+        env:
+          GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON }}
+          SYNC_CONTACTS: 'false'
+        run: python scripts/sync_banks.py
+      - name: Commit only when changed
+        run: |
+          git add memo-data.js
+          if git diff --cached --quiet; then
+            echo "No changes in bank memo."
+          else
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Автообновление памятки из Банки России 3.0"
+            git push
+          fi
