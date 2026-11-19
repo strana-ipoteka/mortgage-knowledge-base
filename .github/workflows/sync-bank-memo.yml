@@ -1,13 +1,21 @@
-name: Sync Bank Memo from Google Sheets
+name: Проверка синхронизации — Банки России 3.0
+
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '15 5,11 * * 1-5'
+    inputs:
+      publish:
+        description: 'Опубликовать обновления на сайте (true только после проверки)'
+        required: true
+        type: boolean
+        default: false
+
 permissions:
   contents: write
+
 concurrency:
   group: sync-bank-memo
   cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -20,17 +28,20 @@ jobs:
           python-version: '3.12'
       - name: Dependencies
         run: python -m pip install --disable-pip-version-check google-auth requests
-      - name: Refresh memo-data.js
+      - name: Refresh memo data
         env:
           GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON }}
           SYNC_CONTACTS: 'false'
+          STRICT_SYNC: 'true'
+          DRY_RUN: ${{ inputs.publish != true }}
         run: python scripts/sync_banks.py
-      - name: Commit only when changed
+      - name: Commit validated updates (only when publish is confirmed)
+        if: ${{ inputs.publish == true }}
         run: |
           git add memo-data.js
           if git diff --cached --quiet; then
-            echo "No changes in bank memo."
+            echo "Изменений нет."
           else
-            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Автообновление памятки из Банки России 3.0"
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Обновление памятки из Google Таблицы"
             git push
           fi
