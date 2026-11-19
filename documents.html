@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Документы на ипотеку — подбор для клиента</title>
+<style>
+:root{--ink:#28223a;--muted:#675d73;--accent:#981777;--light:#f6f2f7;--line:#e8dfe9;--surface:#fff;--s:0 7px 28px #31123510}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--light);font-family:Montserrat,"Segoe UI",Arial,sans-serif;color:var(--ink);line-height:1.5}a{color:#89136b}header{background:linear-gradient(115deg,#53165d,#aa1677);padding:26px max(20px,calc((100% - 1080px)/2));color:#fff}.back{color:#fff;text-decoration:none;font-size:14px;font-weight:650}h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:14px 0 9px}header p{color:#f8dcf2;margin:0;max-width:720px}main{max-width:1090px;margin:0 auto;padding:25px 20px 70px}.shell{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:var(--s)}h2{font-size:23px;margin:0 0 9px}h3{margin:0 0 9px;font-size:17px}p{margin:0 0 12px}.muted{color:var(--muted)}.small{font-size:13px}.stepbar{display:flex;gap:6px;margin:0 0 25px}.stepbar span{height:6px;background:#ece3ee;border-radius:5px;flex:1}.stepbar span.on{background:var(--accent)}.label{display:block;font-size:14px;font-weight:750;margin:20px 0 9px}.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.option{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-radius:12px;border:1px solid #e6dce8;background:#fff;cursor:pointer;min-height:62px}.option:has(input:checked){border-color:var(--accent);background:#faf0f8;box-shadow:inset 0 0 0 1px var(--accent)}.option input{accent-color:var(--accent);margin:5px 0 0}.option span{font-size:14px;font-weight:650}.hint{padding:13px 16px;background:#f8f4fb;border-left:3px solid #bc75a5;border-radius:8px;font-size:13px;color:#564b63;margin:16px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.btn{border:0;border-radius:11px;padding:12px 19px;min-height:45px;font:700 14px inherit;cursor:pointer;color:#fff;background:var(--accent);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn.secondary{background:#eee7f0;color:#4b3055}.btn.outline{background:#fff;color:var(--accent);border:1px solid #d7bbd0}.btn:disabled{opacity:.5;cursor:not-allowed}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.result{background:white;border-radius:20px;padding:26px;border:1px solid var(--line);box-shadow:var(--s)}.meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}.chip{border-radius:100px;background:#f4e9f2;color:#7d2569;font-size:12px;padding:6px 11px}.group{border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:15px}.group h3{color:#8e236f}.docs{display:grid;gap:6px}.doc{display:flex;align-items:flex-start;gap:12px;padding:8px 2px;border-bottom:1px dashed #ece6eb}.doc:last-child{border-bottom:0}.doc input{accent-color:var(--accent);margin-top:5px;flex-shrink:0}.doc span{white-space:pre-wrap;font-size:14px}.doc.done span{text-decoration:line-through;color:#958d9a}.detail{border:1px solid #e9e0eb;border-radius:10px;margin-top:15px;padding:11px 14px;background:#fcfafc}.detail summary{cursor:pointer;font-size:14px;font-weight:700;color:#773d71}.detail p{font-size:13px;white-space:pre-wrap;margin-top:12px}.disclaimer{font-size:12px;color:#6b5c6a;margin-top:18px}.empty{padding:20px;background:#fff7ed;border-radius:10px}.hidden{display:none!important}.toast{position:fixed;bottom:20px;right:20px;background:#26202e;color:white;padding:12px 18px;border-radius:9px;box-shadow:var(--s);z-index:4}.intro{max-width:740px}.num{font-size:13px;color:#9f3381;font-weight:750;text-transform:uppercase;letter-spacing:.05em}.checkrow{display:flex;align-items:center;gap:9px;margin-top:13px;font-size:14px}.checkrow input{accent-color:var(--accent)}
+@media(max-width:680px){main{padding:15px 12px 40px}.shell,.result{padding:17px}.grid{grid-template-columns:1fr}.btn{flex:1} .options{grid-template-columns:1fr}}
+@media print{header,.stepbar,.actions,.screenonly,.detail,.disclaimer,.doc input{display:none!important}body{background:white}main{max-width:none;padding:0}.result{box-shadow:none;border:0;padding:0}.group{break-inside:avoid;padding:10px;border-color:#ddd}.doc{padding:4px 0}.doc.done{display:none}.doc span{text-decoration:none!important;color:#000!important}#questionnaire{display:none!important}h1{color:#000}h2{font-size:19px}.chip{background:#eee;color:#333}@page{size:A4;margin:14mm}}
+</style></head><body>
+<header><a class="back" href="./#home">← К меню отдела ипотеки</a><h1>Документы на ипотеку</h1><p>Персональный список документов по актуальной таблице отдела. Пройдите опрос, чтобы подготовить сообщение для клиента.</p></header>
+<main><section id="questionnaire" class="shell"><div class="stepbar"><span></span><span></span><span></span></div><div id="questions"></div></section><section id="result" class="result hidden" aria-live="polite"></section></main>
+<script src="./documents-data.js?v=20261119"></script>
+<script>
+const D=window.DOCUMENT_RULES;
+const state={program:"family",marital:"single",citizenship:"rf",exception:"foreign",spouse:false,job:"official",cap:false,done:new Set(),step:0};
+const $=s=>document.querySelector(s);
+const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const titleMap={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека"};
+const employmentMap={official:"По найму: полностью официальный доход",partial:"По найму: официальный доход не весь",military:"Военный",company:"ООО",ip_usn:"ИП — УСН",ip_patent:"ИП — патент",self:"Самозанятый"};
+function radio(name,choices){return '<div class="options">'+choices.map(([v,t])=>'<label class="option"><input type="radio" name="'+name+'" value="'+esc(v)+'" '+(state[name]===v?'checked':'')+'><span>'+esc(t)+'</span></label>').join('')+'</div>'}
+function goStep(n){state.step=n;render();scrollTo({top:0,behavior:"smooth"})}
+function render(){const p=D.programs[state.program];$('#result').classList.add('hidden');$('#questionnaire').classList.remove('hidden');document.querySelectorAll('.stepbar span').forEach((n,i)=>n.classList.toggle('on',i<=state.step));
+let html='';
+if(state.step===0){html='<div class="num">Шаг 1 из 3</div><h2>Выберите ипотечную программу</h2><p class="muted">От программы зависит набор документов.</p><label class="label">Программа</label>'+radio('program',[["family","Семейная ипотека"],["it","IT-ипотека"],["standard","Стандартная ипотека"]]);}
+if(state.step===1){
+html='<div class="num">Шаг 2 из 3</div><h2>Сведения о заёмщике</h2><label class="label">Семейное положение</label>'+radio('marital',[["single","Не состоит в браке"],["married","Состоит в браке"]]);
+if(state.program==="standard")html+='<label class="label">Гражданство заёмщика</label>'+radio('citizenship',[["rf","Гражданство РФ"],["foreign","Иностранное гражданство"]]);
+if(state.program==="family"&&state.marital==="married")html+='<label class="label">Статус второго супруга</label>'+radio('exception',[["rf","Оба супруга — граждане РФ"],["foreign","Второй супруг — иностранный гражданин или участник НИС"]]);
+if(state.marital==="married"&&state.program!=="family")html+='<label class="label">Супруг(а) будет участвовать в заявке?</label>'+radio('spouseChoice',[["yes","Да"],["no","Нет"]]);
+if(state.program==="family")html+='<label class="checkrow"><input type="checkbox" id="cap" '+(state.cap?'checked':'')+'> Материнский капитал используется в первоначальном взносе</label>';
+if(state.program==="it")html+='<div class="hint">В исходной таблице для IT-ипотеки приведён перечень личных документов граждан РФ. Для иных вариантов требуется индивидуальная проверка.</div>';
+if(state.program==="standard"&&state.citizenship==="foreign")html+='<div class="hint">Таблица содержит отдельный перечень документов иностранного гражданина. Условия супруга-иностранца требуют дополнительного уточнения.</div>';
+}
+if(state.step===2){const options=state.program==="it"?[["official","Полностью официальный доход"],["partial","Официальный доход не весь"]]:[["official","По найму — полностью официальный доход"],["partial","По найму — официальный доход не весь"],["military","Военный"],["company","ООО"],["ip_usn","ИП — УСН"],["ip_patent","ИП — патент"],["self","Самозанятый"]];
+if(!p.employment[state.job])state.job="official";
+html='<div class="num">Шаг 3 из 3</div><h2>Занятость и доход</h2><p class="muted">Выберите вариант из актуальной таблицы.</p><label class="label">Категория заёмщика</label>'+radio('job',options);
+if(state.program==="it")html+='<div class="hint">По IT-ипотеке в источнике описаны только два варианта подтверждения дохода по найму. Для других типов занятости готовый список без проверки не формируется.</div>';
+}
+html+='<div class="actions">'+(state.step?'<button class="btn secondary" id="prev" type="button">← Назад</button>':'')+'<button class="btn" id="next" type="button">'+(state.step===2?'Получить список документов':'Продолжить →')+'</button></div>';
+$('#questions').innerHTML=html;
+document.querySelectorAll('#questions input[type="radio"]').forEach(input=>input.addEventListener('change',e=>{
+const n=e.target.name,v=e.target.value;
+if(n==="spouseChoice")state.spouse=(v==="yes");else state[n]=v;
+if(n==="program")state.job="official";
+if(n==="marital"&&v==="single")state.spouse=false;
+render();
+}));
+const spouseChoice=document.querySelector('input[name="spouseChoice"]:checked');if(state.step===1&&state.marital==="married"&&state.program!=="family"&&!spouseChoice){document.querySelectorAll('input[name="spouseChoice"]').forEach(x=>x.checked=(x.value===(state.spouse?"yes":"no")))}
+const cap=$('#cap');if(cap)cap.onchange=e=>{state.cap=e.target.checked};
+const back=$('#prev');if(back)back.onclick=()=>goStep(state.step-1);
+$('#next').onclick=()=>state.step<2?goStep(state.step+1):showResult();
+}
+function splitSource(raw){const text=String(raw||"").trim();const cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте ввиду в дальнейшем на сделку потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
+function lines(s){return s.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim())}
+function filterCap(line){return state.cap||!(/выписка об остатке по материнскому капиталу|сертификат по материнскому капиталу/i.test(line))}
+function createSections(){const p=D.programs[state.program];let personal="",note=[];
+if(state.program==="family"){personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);if(state.marital==="married")note.push(state.exception==="rf"?p.notes.married:p.notes.exception)}
+if(state.program==="it"){personal=state.marital==="single"?p.personal.single:p.personal.married;if(state.marital==="married"){note.push(p.notes.married);if(state.spouse)note.push("Если супруг(а) участвует в заявке:\n"+p.notes.spouse)}}
+if(state.program==="standard"){personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);if(state.marital==="married"&&state.spouse)note.push(state.citizenship==="foreign"?p.notes.spouseForeign:p.notes.spouseRF)}
+const first=splitSource(personal);const work=splitSource(p.employment[state.job]);
+let pd=lines(first.list).filter(filterCap),wd=lines(work.list);
+return {groups:[{heading:"Личные документы",docs:pd},{heading:"Подтверждение занятости и дохода",docs:wd}],notes:[...note.filter(Boolean),first.more,work.more].filter(Boolean)};
+}
+let current;
+function buildPlain(missingOnly=true){let out='Документы для подачи заявки на ипотеку\nПрограмма: '+titleMap[state.program]+'\n\n';for(const g of current.groups){const docs=g.docs.filter((x,i)=>!missingOnly||!state.done.has(g.heading+":"+i));if(!docs.length)continue;out+=g.heading+':\n'+docs.map(x=>'• '+x).join('\n')+'\n\n';}return out.trim();}
+function showResult(){current=createSections();state.done=new Set();$('#questionnaire').classList.add('hidden');$('#result').classList.remove('hidden');
+const chips=[titleMap[state.program],state.marital==="married"?"В браке":"Не состоит в браке",employmentMap[state.job]];
+let html='<div class="num screenonly">Готовый список для клиента</div><h2>Документы для подачи заявки</h2><div class="meta">'+chips.map(x=>'<span class="chip">'+esc(x)+'</span>').join('')+'</div><p class="muted small screenonly">Отметьте уже полученные документы — при копировании и печати они не войдут в список оставшихся.</p>';
+current.groups.forEach((g,gi)=>{html+='<div class="group"><h3>'+esc(g.heading)+'</h3><div class="docs">'+(g.docs.length?g.docs.map((x,i)=>'<label class="doc"><input type="checkbox" data-gi="'+gi+'" data-i="'+i+'"><span>'+esc(x)+'</span></label>').join(''):'<p class="muted">По выбранным параметрам перечень не заполнен в источнике.</p>')+'</div></div>'});
+if(current.notes.length)html+='<details class="detail screenonly"><summary>Важные примечания и инструкции из Google Таблицы</summary>'+current.notes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</details>';
+html+='<div class="actions screenonly"><button class="btn" id="copy" type="button">Скопировать список</button><button class="btn secondary" id="print" type="button">Скачать / распечатать PDF</button><button class="btn outline" id="reset" type="button">← Изменить ответы</button></div>';
+html+='<p class="disclaimer screenonly">Основано на рабочей таблице отдела. Требования конкретного банка могут отличаться. Для нестандартных случаев проверьте перечень с ипотечным брокером. <a href="'+esc(D.source)+'" target="_blank" rel="noopener">Исходная Google Таблица ↗</a></p>';
+$('#result').innerHTML=html;
+document.querySelectorAll('.doc input').forEach(el=>el.onchange=()=>{const key=current.groups[+el.dataset.gi].heading+":"+el.dataset.i;el.checked?state.done.add(key):state.done.delete(key);el.parentElement.classList.toggle('done',el.checked)});
+$('#copy').onclick=()=>copyText(buildPlain());$('#print').onclick=()=>window.print();$('#reset').onclick=()=>goStep(0);scrollTo({top:0,behavior:"smooth"});
+}
+function copyText(t){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(t).then(()=>toast("Список скопирован"),()=>fallback(t));}else fallback(t)}
+function fallback(t){const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.append(a);a.select();document.execCommand("copy");a.remove();toast("Список скопирован")}
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2400)}
+state.spouseChoice="no";render();
+</script></body></html>
