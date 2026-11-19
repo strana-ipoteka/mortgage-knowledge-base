@@ -10,7 +10,7 @@
 @media(max-width:560px){.pagehead{align-items:center}.softmark{display:none}.choices{grid-template-columns:1fr}.choice{min-height:70px}.footnav .btn{flex:1}.resultactions .btn{width:100%}.summaryheader h2{font-size:24px}}
 @media print{header,.pagehead,.sidebar,.panel,.resultactions,.footerhint,.resultnote{display:none!important}body{background:white}.page{padding:0;max-width:none}.layout{display:block}.summary{box-shadow:none;border:0}.summaryheader{padding:8px 0 15px;background:white}.summarybody{padding:0}.doc{padding:4px 0}.doc span{color:#222!important}.client-notes{background:#fff6fc!important;border-color:#d5a4c6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.section{break-inside:avoid}@page{size:A4;margin:15mm}}
 </style></head><body><header><div class="headinner"><a class="back" href="./#home">← К базе знаний</a><span class="wordmark">Отдел ипотеки</span></div></header><main class="page"><div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Документы на ипотеку</h1><p>Ответьте на вопросы — получите готовый список для клиента.</p></div><div class="softmark">▤</div></div><div class="layout"><aside class="sidebar"><h3>Подбор документов</h3><div class="steps" id="steps"></div><div class="sidetip">Перечень составляется по актуальной рабочей таблице отдела. Данные клиента на сайте не сохраняются.</div></aside><div><section class="panel" id="questionnaire"><div class="progressline"><span id="progress"></span></div><div id="questions"></div></section><section class="summary hidden" id="result"></section></div></div></main>
-<script src="./documents-data.js?v=capitalization-20261119-2"></script>
+<script src="./documents-data.js?v=matcapital-clean-20261119"></script>
 <script>
 
 const D=window.DOCUMENT_RULES;
@@ -50,7 +50,7 @@ function docGroups(){
  if(state.program==="it")personal=state.marital==="single"?p.personal.single:p.personal.married;
  if(state.program==="standard")personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);
  const a=splitSource(personal),b=splitSource(p.employment[state.job]);
- const personalDocs=lines(a.list).filter(x=>state.program!=="family"||state.capital==="yes"||!/выписка об остатке по материнскому капиталу|сертификат по материнскому капиталу/i.test(x));
+ const personalDocs=lines(a.list).filter(x=>state.program!=="family"||state.capital==="yes"||!/выписка об остатке по материнскому капиталу|сертификат (?:на|по) материнскому капиталу/i.test(x));
  const groups=[{title:"Личные документы",docs:personalDocs}];
  if(state.marital==="married"&&state.spouse==="yes"&&state.program!=="family"){
    const rf=["Номер телефона супруга, привязанный к Госуслугам","Паспорт супруга — все страницы, включая пустые (9 разворотов)","СНИЛС супруга","ИНН супруга"];
@@ -59,6 +59,15 @@ function docGroups(){
    groups.push({title:"Документы супруга, участвующего в заявке",docs:spouseDocs});
  }
  groups.push({title:"Занятость и подтверждение дохода",docs:lines(b.list)});
+ // Исключаем повторный запрос одного и того же документа в разных блоках.
+ const seen=new Set();
+ for(const group of groups){
+   group.docs=group.docs.filter(doc=>{
+     const key=doc.replace(/[.;]+$/g,"").replace(/\s+/g," ").trim().toLocaleLowerCase("ru-RU");
+     if(seen.has(key))return false;
+     seen.add(key);return true;
+   });
+ }
  return {groups,notes:[a.more,b.more].filter(Boolean)};
 }
 let current=null;
