@@ -133,6 +133,9 @@ def refresh_cards(section, rows):
             if nv and nv != kv[1]:
                 kv[1] = nv
                 changed += 1
+    for card in section.get("items", []):
+        if card.get("t") == "card":
+            card["s"] = (card.get("n", "") + " " + " ".join(str(z) for kv in card.get("kv", []) for z in kv)).casefold()
     return changed, matched, f"Matched {matched} cards; {changed} updated fields"
 
 def refresh_table(section, rows):
