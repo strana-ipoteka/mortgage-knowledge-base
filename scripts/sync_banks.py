@@ -244,10 +244,13 @@ def main():
             untouched.append(sid)
     if untouched:
         print("WARNING: no records matched in: " + ", ".join(untouched), file=sys.stderr)
+    if untouched and os.environ.get("STRICT_SYNC") == "true":
+        raise SystemExit("Strict mode: some sections could not be refreshed. Existing site data preserved.")
+    if os.environ.get("DRY_RUN", "true").lower() == "true":
+        print(f"DRY RUN: {updates} updated cells/rows would be applied. No files changed.")
+        return
     if updates:
         DATA_FILE.write_text(PREFIX+json.dumps(data, ensure_ascii=False, separators=(",",":"))+";\n",encoding="utf-8")
     print(f"Synchronization finished: {updates} updated cells/rows.")
-    if untouched and os.environ.get("STRICT_SYNC") == "true":
-        raise SystemExit("Strict mode: some sections could not be refreshed")
 if __name__ == "__main__":
     main()
