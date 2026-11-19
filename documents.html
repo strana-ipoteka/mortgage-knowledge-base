@@ -10,14 +10,14 @@
 @media(max-width:560px){.pagehead{align-items:center}.softmark{display:none}.choices{grid-template-columns:1fr}.choice{min-height:70px}.footnav .btn{flex:1}.resultactions .btn{width:100%}.summaryheader h2{font-size:24px}}
 @media print{header,.pagehead,.sidebar,.panel,.resultactions,.footerhint,.resultnote{display:none!important}body{background:white}.page{padding:0;max-width:none}.layout{display:block}.summary{box-shadow:none;border:0}.summaryheader{padding:8px 0 15px;background:white}.summarybody{padding:0}.doc{padding:4px 0}.doc span{color:#222!important}.client-notes{background:#fff6fc!important;border-color:#d5a4c6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.section{break-inside:avoid}@page{size:A4;margin:15mm}}
 </style></head><body><header><div class="headinner"><a class="back" href="./#home">← К базе знаний</a><span class="wordmark">Отдел ипотеки</span></div></header><main class="page"><div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Документы на ипотеку</h1><p>Ответьте на вопросы — получите готовый список для клиента.</p></div><div class="softmark">▤</div></div><div class="layout"><aside class="sidebar"><h3>Подбор документов</h3><div class="steps" id="steps"></div><div class="sidetip">Перечень составляется по актуальной рабочей таблице отдела. Данные клиента на сайте не сохраняются.</div></aside><div><section class="panel" id="questionnaire"><div class="progressline"><span id="progress"></span></div><div id="questions"></div></section><section class="summary hidden" id="result"></section></div></div></main>
-<script src="./documents-data.js?v=matcapital-clean-20261119"></script>
+<script src="./documents-data.js?v=no-military-20261119"></script>
 <script>
 
 const D=window.DOCUMENT_RULES;
 const state={program:"family",marital:"single",citizenship:"rf",exception:"rf",spouse:"no",spouseCitizenship:"rf",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · доход частично неофициальный",military:"Военнослужащий",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
+const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · доход частично неофициальный",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
 function qs(){
  const q=[
  {key:"program",title:"Какую ипотечную программу оформляет клиент?",hint:"Выберите программу, чтобы подобрать соответствующий комплект документов.",opts:[["family","Семейная ипотека","⌂"],["it","IT-ипотека","⌘"],["standard","Стандартная ипотека","▤"]]},
@@ -28,7 +28,7 @@ function qs(){
  if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли супруг(а) участвовать в заявке?",hint:"Если супруг(а) участвует в заявке, добавим необходимые документы в итоговый список.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
  if(state.program==="standard"&&state.marital==="married"&&state.spouse==="yes"&&state.citizenship==="foreign")q.push({key:"spouseCitizenship",title:"Какое гражданство у супруга, участвующего в заявке?",hint:"В источнике для супруга — гражданина РФ и супруга-иностранца предусмотрены разные списки.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
  if(state.program==="family")q.push({key:"capital",title:"Материнский капитал используется в первоначальном взносе?",hint:"При использовании маткапитала потребуются дополнительные документы.",opts:[["yes","Да, используем","✓"],["no","Нет","×"]]});
- q.push({key:"job",title:"Как клиент подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите подходящую категорию занятости.",opts:state.program==="it"?[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"]]:[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"],["military","Военнослужащий","☆"],["company","ООО","▦"],["ip_usn","ИП · УСН","◈"],["ip_patent","ИП · патент","◈"],["self","Самозанятый","◇"]]});
+ q.push({key:"job",title:"Как клиент подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите подходящую категорию занятости.",opts:state.program==="it"?[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"]]:[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"],["company","ООО","▦"],["ip_usn","ИП · УСН","◈"],["ip_patent","ИП · патент","◈"],["self","Самозанятый","◇"]]});
  return q;
 }
 function showStep(){
