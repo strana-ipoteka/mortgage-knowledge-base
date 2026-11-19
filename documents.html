@@ -68,7 +68,8 @@ function docGroups(){
      seen.add(key);return true;
    });
  }
- return {groups,notes:[a.more,b.more].filter(Boolean)};
+ const familyForeignNote=state.program==="family"&&state.marital==="married"&&state.exception==="foreign"?"При оформлении семейной ипотеки, если один из супругов — иностранный гражданин, супруг(а) исключается из кредитного договора на основании брачного договора.":"";
+ return {groups,notes:[familyForeignNote,a.more,b.more].filter(Boolean)};
 }
 let current=null;
 function copyList(){let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";for(const g of current.groups){if(g.docs.length)result+=g.title+":\n"+g.docs.map(x=>"• "+x).join("\n")+"\n\n"}if(current.notes.length)result+="ВАЖНО ДЛЯ КЛИЕНТА — ДОПОЛНИТЕЛЬНЫЕ УСЛОВИЯ И ИНСТРУКЦИИ\n"+current.notes.join("\n\n")+"\n";return result.trim()}
