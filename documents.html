@@ -10,7 +10,7 @@
 @media(max-width:560px){.pagehead{align-items:center}.softmark{display:none}.choices{grid-template-columns:1fr}.choice{min-height:70px}.footnav .btn{flex:1}.resultactions .btn{width:100%}.summaryheader h2{font-size:24px}}
 @media print{header,.pagehead,.sidebar,.panel,.resultactions,.footerhint,.resultnote{display:none!important}body{background:white}.page{padding:0;max-width:none}.layout{display:block}.summary{box-shadow:none;border:0}.summaryheader{padding:8px 0 15px;background:white}.summarybody{padding:0}.doc{padding:4px 0}.doc span{color:#222!important}.client-notes{background:#fff6fc!important;border-color:#d5a4c6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.section{break-inside:avoid}@page{size:A4;margin:15mm}}
 </style></head><body><header><div class="headinner"><a class="back" href="./#home">← К базе знаний</a><span class="wordmark">Отдел ипотеки</span></div></header><main class="page"><div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Документы на ипотеку</h1><p>Ответьте на вопросы — получите готовый список для клиента.</p></div><div class="softmark">▤</div></div><div class="layout"><aside class="sidebar"><h3>Подбор документов</h3><div class="steps" id="steps"></div><div class="sidetip">Перечень составляется по актуальной рабочей таблице отдела. Данные клиента на сайте не сохраняются.</div></aside><div><section class="panel" id="questionnaire"><div class="progressline"><span id="progress"></span></div><div id="questions"></div></section><section class="summary hidden" id="result"></section></div></div></main>
-<script src="./documents-data.js?v=20261119"></script>
+<script src="./documents-data.js?v=capitalization-20261119-2"></script>
 <script>
 
 const D=window.DOCUMENT_RULES;
@@ -42,7 +42,7 @@ function showStep(){
  $('#next').onclick=()=>{if(state.idx===qs().length-1)showResult();else{state.idx++;showStep()}};
 }
 function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте в виду, что в дальнейшем для сделки потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
-function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim())}
+function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim()).map(x=>x.replace(/^([а-яё])/u,(_,letter)=>letter.toLocaleUpperCase("ru-RU")))}
 function docGroups(){
  const p=D.programs[state.program];let personal="";
  // Тексты про условия участия супруга — правила опроса, а не текст клиентской памятки.
