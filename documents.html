@@ -14,7 +14,7 @@
 <script>
 
 const D=window.DOCUMENT_RULES;
-const state={program:"family",marital:"single",citizenship:"rf",exception:"rf",spouse:"no",spouseCitizenship:"rf",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
+const state={program:"family",marital:"single",citizenship:"rf",spouse:"no",spouseCitizenship:"rf",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · доход частично неофициальный",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
@@ -24,7 +24,6 @@ function qs(){
  {key:"marital",title:"Какое семейное положение у клиента?",hint:"Для супругов могут потребоваться дополнительные документы.",opts:[["single","Не состоит в браке","◯"],["married","Состоит в браке","♡"]]}
  ];
  if(state.program==="standard")q.push({key:"citizenship",title:"Какое гражданство у заёмщика?",hint:"В источнике есть отдельный комплект для иностранного гражданина.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
- if(state.program==="family"&&state.marital==="married")q.push({key:"exception",title:"Какой статус у второго супруга?",hint:"Для второго супруга — иностранного гражданина предусмотрен отдельный перечень документов.",opts:[["rf","Оба супруга — граждане РФ","♡"],["foreign","Второй супруг — иностранный гражданин","◎"]]});
  if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли супруг(а) участвовать в заявке?",hint:"Если супруг(а) участвует в заявке, добавим необходимые документы в итоговый список.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
  if(state.program==="standard"&&state.marital==="married"&&state.spouse==="yes"&&state.citizenship==="foreign")q.push({key:"spouseCitizenship",title:"Какое гражданство у супруга, участвующего в заявке?",hint:"В источнике для супруга — гражданина РФ и супруга-иностранца предусмотрены разные списки.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
  if(state.program==="family")q.push({key:"capital",title:"Материнский капитал используется в первоначальном взносе?",hint:"При использовании маткапитала потребуются дополнительные документы.",opts:[["yes","Да, используем","✓"],["no","Нет","×"]]});
@@ -34,7 +33,7 @@ function qs(){
 function showStep(){
  const questions=qs();state.idx=Math.min(state.idx,questions.length-1);const q=questions[state.idx];$('#result').classList.add('hidden');$('#questionnaire').classList.remove('hidden');
  $('#progress').style.width=Math.round((state.idx+1)/questions.length*100)+"%";
- $('#steps').innerHTML=questions.map((x,i)=>'<div class="navstep '+(i===state.idx?'current':i<state.idx?'past':'')+'"><span class="dot">'+(i<state.idx?'✓':i+1)+'</span><span>'+esc(x.key==="program"?"Программа":x.key==="marital"?"Семейное положение":x.key==="job"?"Занятость":x.key==="citizenship"?"Гражданство":x.key==="exception"?"Супруг":x.key==="capital"?"Маткапитал":x.key==="spouseCitizenship"?"Гражданство супруга":"Участие супруга")+'</span></div>').join('');
+ $('#steps').innerHTML=questions.map((x,i)=>'<div class="navstep '+(i===state.idx?'current':i<state.idx?'past':'')+'"><span class="dot">'+(i<state.idx?'✓':i+1)+'</span><span>'+esc(x.key==="program"?"Программа":x.key==="marital"?"Семейное положение":x.key==="job"?"Занятость":x.key==="citizenship"?"Гражданство":x.key==="capital"?"Маткапитал":x.key==="spouseCitizenship"?"Гражданство супруга":"Участие супруга")+'</span></div>').join('');
  const body='<div class="counter">Вопрос '+(state.idx+1)+' из '+questions.length+'</div><h2 class="questiontitle">'+esc(q.title)+'</h2><p class="questionhint">'+esc(q.hint)+'</p><div class="choices">'+q.opts.map(([val,name,icon])=>'<button class="choice '+(state[q.key]===val?'selected':'')+'" type="button" data-value="'+esc(val)+'"><span class="choiceicon">'+esc(icon)+'</span><span class="choicetext">'+esc(name)+'</span><span class="tick"></span></button>').join('')+'</div><div class="footnav"><button type="button" class="btn secondary" id="prev" '+(state.idx===0?'disabled':'')+'>← Назад</button><button type="button" class="btn" id="next">'+(state.idx===questions.length-1?'Сформировать список →':'Далее →')+'</button></div>';
  $('#questions').innerHTML=body;
  document.querySelectorAll('.choice').forEach(el=>el.onclick=()=>{state[q.key]=el.dataset.value;if(q.key==="program")state.job="official";if(q.key==="marital"&&state.marital==="single")state.spouse="no";showStep()});
@@ -46,7 +45,7 @@ function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).m
 function docGroups(){
  const p=D.programs[state.program];let personal="";
  // Тексты про условия участия супруга — правила опроса, а не текст клиентской памятки.
- if(state.program==="family")personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);
+ if(state.program==="family")personal=state.marital==="single"?p.personal.single:p.personal.married;
  if(state.program==="it")personal=state.marital==="single"?p.personal.single:p.personal.married;
  if(state.program==="standard")personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);
  const a=splitSource(personal),b=splitSource(p.employment[state.job]);
@@ -68,8 +67,8 @@ function docGroups(){
      seen.add(key);return true;
    });
  }
- const familyForeignNote=state.program==="family"&&state.marital==="married"&&state.exception==="foreign"?"При оформлении семейной ипотеки, если один из супругов — иностранный гражданин, супруг(а) исключается из кредитного договора на основании брачного договора.":"";
- return {groups,notes:[familyForeignNote,a.more,b.more].filter(Boolean)};
+ const familySpouseNote=state.program==="family"&&state.marital==="married"?"С 01.02.2026 оба супруга обязаны участвовать в кредитном договоре по семейной ипотеке. Исключение — супруг(а), являющийся нерезидентом.":"";
+ return {groups,notes:[familySpouseNote,a.more,b.more].filter(Boolean)};
 }
 let current=null;
 function copyList(){let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";for(const g of current.groups){if(g.docs.length)result+=g.title+":\n"+g.docs.map(x=>"• "+x).join("\n")+"\n\n"}if(current.notes.length)result+="ВАЖНО ДЛЯ КЛИЕНТА — ДОПОЛНИТЕЛЬНЫЕ УСЛОВИЯ И ИНСТРУКЦИИ\n"+current.notes.join("\n\n")+"\n";return result.trim()}
