@@ -12,71 +12,58 @@
 </style></head><body><header><div class="headinner"><a class="back" href="./#home">← К базе знаний</a><span class="wordmark">Отдел ипотеки</span></div></header><main class="page"><div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Документы на ипотеку</h1><p>Ответьте на вопросы — получите готовый список для клиента.</p></div><div class="softmark">▤</div></div><div class="layout"><aside class="sidebar"><h3>Подбор документов</h3><div class="steps" id="steps"></div><div class="sidetip">Перечень составляется по актуальной рабочей таблице отдела. Данные клиента на сайте не сохраняются.</div></aside><div><section class="panel" id="questionnaire"><div class="progressline"><span id="progress"></span></div><div id="questions"></div></section><section class="summary hidden" id="result"></section></div></div></main>
 <script src="./documents-data.js?v=20261119"></script>
 <script>
+
 const D=window.DOCUMENT_RULES;
-const state={program:"family",marital:"single",citizenship:"rf",exception:"foreign",spouse:false,job:"official",cap:false,done:new Set(),step:0};
+const state={program:"family",marital:"single",citizenship:"rf",exception:"rf",spouse:"no",job:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
 const $=s=>document.querySelector(s);
-const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const titleMap={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека"};
-const employmentMap={official:"По найму: полностью официальный доход",partial:"По найму: официальный доход не весь",military:"Военный",company:"ООО",ip_usn:"ИП — УСН",ip_patent:"ИП — патент",self:"Самозанятый"};
-function radio(name,choices){return '<div class="options">'+choices.map(([v,t])=>'<label class="option"><input type="radio" name="'+name+'" value="'+esc(v)+'" '+(state[name]===v?'checked':'')+'><span>'+esc(t)+'</span></label>').join('')+'</div>'}
-function goStep(n){state.step=n;render();scrollTo({top:0,behavior:"smooth"})}
-function render(){const p=D.programs[state.program];$('#result').classList.add('hidden');$('#questionnaire').classList.remove('hidden');document.querySelectorAll('.stepbar span').forEach((n,i)=>n.classList.toggle('on',i<=state.step));
-let html='';
-if(state.step===0){html='<div class="num">Шаг 1 из 3</div><h2>Выберите ипотечную программу</h2><p class="muted">От программы зависит набор документов.</p><label class="label">Программа</label>'+radio('program',[["family","Семейная ипотека"],["it","IT-ипотека"],["standard","Стандартная ипотека"]]);}
-if(state.step===1){
-html='<div class="num">Шаг 2 из 3</div><h2>Сведения о заёмщике</h2><label class="label">Семейное положение</label>'+radio('marital',[["single","Не состоит в браке"],["married","Состоит в браке"]]);
-if(state.program==="standard")html+='<label class="label">Гражданство заёмщика</label>'+radio('citizenship',[["rf","Гражданство РФ"],["foreign","Иностранное гражданство"]]);
-if(state.program==="family"&&state.marital==="married")html+='<label class="label">Статус второго супруга</label>'+radio('exception',[["rf","Оба супруга — граждане РФ"],["foreign","Второй супруг — иностранный гражданин или участник НИС"]]);
-if(state.marital==="married"&&state.program!=="family")html+='<label class="label">Супруг(а) будет участвовать в заявке?</label>'+radio('spouseChoice',[["yes","Да"],["no","Нет"]]);
-if(state.program==="family")html+='<label class="checkrow"><input type="checkbox" id="cap" '+(state.cap?'checked':'')+'> Материнский капитал используется в первоначальном взносе</label>';
-if(state.program==="it")html+='<div class="hint">В исходной таблице для IT-ипотеки приведён перечень личных документов граждан РФ. Для иных вариантов требуется индивидуальная проверка.</div>';
-if(state.program==="standard"&&state.citizenship==="foreign")html+='<div class="hint">Таблица содержит отдельный перечень документов иностранного гражданина. Условия супруга-иностранца требуют дополнительного уточнения.</div>';
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · часть дохода неофициальная",military:"Военнослужащий",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
+function qs(){
+ const q=[
+ {key:"program",title:"Какую ипотечную программу оформляет клиент?",hint:"Выберите программу, чтобы подобрать соответствующий комплект документов.",opts:[["family","Семейная ипотека","⌂"],["it","IT-ипотека","⌘"],["standard","Стандартная ипотека","▤"]]},
+ {key:"marital",title:"Какое семейное положение у клиента?",hint:"Для супругов могут потребоваться дополнительные документы.",opts:[["single","Не состоит в браке","◯"],["married","Состоит в браке","♡"]]}
+ ];
+ if(state.program==="standard")q.push({key:"citizenship",title:"Какое гражданство у заёмщика?",hint:"В источнике есть отдельный комплект для иностранного гражданина.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
+ if(state.program==="family"&&state.marital==="married")q.push({key:"exception",title:"Какой статус у второго супруга?",hint:"Источник отдельно выделяет исключения для иностранного гражданина и участника НИС.",opts:[["rf","Оба супруга — граждане РФ","♡"],["foreign","Второй супруг — иностранец или участник НИС","◎"]]});
+ if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли супруг(а) участвовать в заявке?",hint:"Если участвует, добавим документы супруга из актуальной таблицы.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
+ if(state.program==="family")q.push({key:"capital",title:"Материнский капитал используется в первоначальном взносе?",hint:"При использовании маткапитала потребуются дополнительные документы.",opts:[["yes","Да, используем","✓"],["no","Нет","×"]]});
+ q.push({key:"job",title:"Как клиент подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите соответствующую категорию занятости.",opts:state.program==="it"?[["official","По найму · официальный доход","▤"],["partial","По найму · не весь доход официальный","▥"]]:[["official","По найму · официальный доход","▤"],["partial","По найму · не весь доход официальный","▥"],["military","Военнослужащий","☆"],["company","ООО","▦"],["ip_usn","ИП · УСН","◈"],["ip_patent","ИП · патент","◈"],["self","Самозанятый","◇"]]});
+ return q;
 }
-if(state.step===2){const options=state.program==="it"?[["official","Полностью официальный доход"],["partial","Официальный доход не весь"]]:[["official","По найму — полностью официальный доход"],["partial","По найму — официальный доход не весь"],["military","Военный"],["company","ООО"],["ip_usn","ИП — УСН"],["ip_patent","ИП — патент"],["self","Самозанятый"]];
-if(!p.employment[state.job])state.job="official";
-html='<div class="num">Шаг 3 из 3</div><h2>Занятость и доход</h2><p class="muted">Выберите вариант из актуальной таблицы.</p><label class="label">Категория заёмщика</label>'+radio('job',options);
-if(state.program==="it")html+='<div class="hint">По IT-ипотеке в источнике описаны только два варианта подтверждения дохода по найму. Для других типов занятости готовый список без проверки не формируется.</div>';
+function showStep(){
+ const questions=qs();state.idx=Math.min(state.idx,questions.length-1);const q=questions[state.idx];$('#result').classList.add('hidden');$('#questionnaire').classList.remove('hidden');
+ $('#progress').style.width=Math.round((state.idx+1)/questions.length*100)+"%";
+ $('#steps').innerHTML=questions.map((x,i)=>'<div class="navstep '+(i===state.idx?'current':i<state.idx?'past':'')+'"><span class="dot">'+(i<state.idx?'✓':i+1)+'</span><span>'+esc(x.key==="program"?"Программа":x.key==="marital"?"Семейное положение":x.key==="job"?"Занятость":x.key==="citizenship"?"Гражданство":x.key==="exception"?"Супруг":x.key==="capital"?"Маткапитал":"Участие супруга")+'</span></div>').join('');
+ const body='<div class="counter">Вопрос '+(state.idx+1)+' из '+questions.length+'</div><h2 class="questiontitle">'+esc(q.title)+'</h2><p class="questionhint">'+esc(q.hint)+'</p><div class="choices">'+q.opts.map(([val,name,icon])=>'<button class="choice '+(state[q.key]===val?'selected':'')+'" type="button" data-value="'+esc(val)+'"><span class="choiceicon">'+esc(icon)+'</span><span class="choicetext">'+esc(name)+'</span><span class="tick"></span></button>').join('')+'</div><div class="footnav"><button type="button" class="btn secondary" id="prev" '+(state.idx===0?'disabled':'')+'>← Назад</button><button type="button" class="btn" id="next">'+(state.idx===questions.length-1?'Сформировать список →':'Далее →')+'</button></div>';
+ $('#questions').innerHTML=body;
+ document.querySelectorAll('.choice').forEach(el=>el.onclick=()=>{state[q.key]=el.dataset.value;if(q.key==="program")state.job="official";if(q.key==="marital"&&state.marital==="single")state.spouse="no";showStep()});
+ $('#prev').onclick=()=>{if(state.idx>0){state.idx--;showStep()}};
+ $('#next').onclick=()=>{if(state.idx===qs().length-1)showResult();else{state.idx++;showStep()}};
 }
-html+='<div class="actions">'+(state.step?'<button class="btn secondary" id="prev" type="button">← Назад</button>':'')+'<button class="btn" id="next" type="button">'+(state.step===2?'Получить список документов':'Продолжить →')+'</button></div>';
-$('#questions').innerHTML=html;
-document.querySelectorAll('#questions input[type="radio"]').forEach(input=>input.addEventListener('change',e=>{
-const n=e.target.name,v=e.target.value;
-if(n==="spouseChoice"){state.spouse=(v==="yes");state.spouseChoice=v}else state[n]=v;
-if(n==="program")state.job="official";
-if(n==="marital"&&v==="single"){state.spouse=false;state.spouseChoice="no"}
-render();
-}));
-const spouseChoice=document.querySelector('input[name="spouseChoice"]:checked');if(state.step===1&&state.marital==="married"&&state.program!=="family"&&!spouseChoice){document.querySelectorAll('input[name="spouseChoice"]').forEach(x=>x.checked=(x.value===(state.spouse?"yes":"no")))}
-const cap=$('#cap');if(cap)cap.onchange=e=>{state.cap=e.target.checked};
-const back=$('#prev');if(back)back.onclick=()=>goStep(state.step-1);
-$('#next').onclick=()=>state.step<2?goStep(state.step+1):showResult();
+function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте ввиду в дальнейшем на сделку потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
+function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim())}
+function docGroups(){
+ const p=D.programs[state.program];let personal="",notes=[];
+ if(state.program==="family"){personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);if(state.marital==="married")notes.push(state.exception==="rf"?p.notes.married:p.notes.exception)}
+ if(state.program==="it"){personal=state.marital==="single"?p.personal.single:p.personal.married;if(state.marital==="married"){notes.push(p.notes.married);if(state.spouse==="yes")notes.push(p.notes.spouse)}}
+ if(state.program==="standard"){personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);if(state.marital==="married"&&state.spouse==="yes")notes.push(state.citizenship==="foreign"?p.notes.spouseForeign:p.notes.spouseRF)}
+ const a=splitSource(personal),b=splitSource(p.employment[state.job]);
+ const personalDocs=lines(a.list).filter(x=>state.program!=="family"||state.capital==="yes"||!/выписка об остатке по материнскому капиталу|сертификат по материнскому капиталу/i.test(x));
+ return {groups:[{title:"Личные документы",docs:personalDocs},{title:"Занятость и подтверждение дохода",docs:lines(b.list)}],notes:[...notes,a.more,b.more].filter(Boolean)};
 }
-function splitSource(raw){const text=String(raw||"").trim();const cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте ввиду в дальнейшем на сделку потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
-function lines(s){return s.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim())}
-function filterCap(line){return state.cap||!(/выписка об остатке по материнскому капиталу|сертификат по материнскому капиталу/i.test(line))}
-function createSections(){const p=D.programs[state.program];let personal="",note=[];
-if(state.program==="family"){personal=state.marital==="single"?p.personal.single:(state.exception==="rf"?p.personal.married:p.personal.exception);if(state.marital==="married")note.push(state.exception==="rf"?p.notes.married:p.notes.exception)}
-if(state.program==="it"){personal=state.marital==="single"?p.personal.single:p.personal.married;if(state.marital==="married"){note.push(p.notes.married);if(state.spouse)note.push("Если супруг(а) участвует в заявке:\n"+p.notes.spouse)}}
-if(state.program==="standard"){personal=state.citizenship==="foreign"?p.personal.foreign:(state.marital==="married"?p.personal.married:p.personal.single);if(state.marital==="married"&&state.spouse)note.push(state.citizenship==="foreign"?p.notes.spouseForeign:p.notes.spouseRF)}
-const first=splitSource(personal);const work=splitSource(p.employment[state.job]);
-let pd=lines(first.list).filter(filterCap),wd=lines(work.list);
-return {groups:[{heading:"Личные документы",docs:pd},{heading:"Подтверждение занятости и дохода",docs:wd}],notes:[...note.filter(Boolean),first.more,work.more].filter(Boolean)};
+let current=null;
+function copyList(){let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";for(const g of current.groups){const docs=g.docs.filter((_,i)=>!state.done.has(g.title+":"+i));if(docs.length)result+=g.title+":\n"+docs.map(x=>"• "+x).join("\n")+"\n\n"}return result.trim()}
+function toast(msg){const div=document.createElement('div');div.className="toast";div.textContent=msg;document.body.append(div);setTimeout(()=>div.remove(),2200)}
+function copy(t){const fallback=()=>{const a=document.createElement("textarea");a.value=t;document.body.append(a);a.select();document.execCommand("copy");a.remove();toast("Список скопирован")};navigator.clipboard?.writeText?navigator.clipboard.writeText(t).then(()=>toast("Список скопирован"),fallback):fallback()}
+function showResult(){
+ current=docGroups();state.done=new Set();$('#questionnaire').classList.add('hidden');$('#result').classList.remove('hidden');$('#steps').innerHTML='<div class="navstep past"><span class="dot">✓</span><span>Ответы получены</span></div><div class="navstep current"><span class="dot">✓</span><span>Список документов</span></div>';
+ let html='<div class="summaryheader"><div class="eyebrow">Готово к отправке клиенту</div><h2>Список документов</h2><div class="chips"><span class="chip">'+esc(labels[state.program])+'</span><span class="chip">'+esc(state.marital==="married"?"В браке":"Не состоит в браке")+'</span><span class="chip">'+esc(labels[state.job])+'</span></div></div><div class="summarybody"><p class="resultnote">Отмечайте уже полученные документы. При копировании и сохранении в PDF они будут исключены.</p><div class="resultactions"><button type="button" class="btn" id="copy">⧉ Скопировать для клиента</button><button type="button" class="btn secondary" id="pdf">↓ Сохранить PDF</button><button type="button" class="btn outline" id="edit">← Изменить ответы</button></div>';
+ current.groups.forEach((g,k)=>{html+='<div class="section"><h3>'+esc(g.title)+'</h3>'+(g.docs.length?g.docs.map((d,i)=>'<label class="doc"><input type="checkbox" data-group="'+k+'" data-row="'+i+'"><span>'+esc(d)+'</span></label>').join(''):'<p class="resultnote">Перечень не указан в исходной таблице.</p>')+'</div>'});
+ if(current.notes.length)html+='<details class="details"><summary>Подсказки менеджеру и инструкции из источника</summary>'+current.notes.map(s=>'<p>'+esc(s)+'</p>').join('')+'</details>';
+ html+='<p class="footerhint">Перечень составлен по рабочей Google Таблице. Для нестандартных ситуаций необходимо подтвердить требования у ипотечного брокера. <a href="'+esc(D.source)+'" target="_blank" rel="noopener">Посмотреть источник ↗</a></p></div>';
+ $('#result').innerHTML=html;
+ document.querySelectorAll('.doc input').forEach(el=>el.onchange=()=>{const g=current.groups[+el.dataset.group];const key=g.title+":"+el.dataset.row;el.checked?state.done.add(key):state.done.delete(key);el.parentElement.classList.toggle("done",el.checked)});
+ $('#copy').onclick=()=>copy(copyList());$('#pdf').onclick=()=>window.print();$('#edit').onclick=()=>{state.idx=0;showStep()};scrollTo({top:0,behavior:"smooth"});
 }
-let current;
-function buildPlain(missingOnly=true){let out='Документы для подачи заявки на ипотеку\nПрограмма: '+titleMap[state.program]+'\n\n';for(const g of current.groups){const docs=g.docs.filter((x,i)=>!missingOnly||!state.done.has(g.heading+":"+i));if(!docs.length)continue;out+=g.heading+':\n'+docs.map(x=>'• '+x).join('\n')+'\n\n';}return out.trim();}
-function showResult(){current=createSections();state.done=new Set();$('#questionnaire').classList.add('hidden');$('#result').classList.remove('hidden');
-const chips=[titleMap[state.program],state.marital==="married"?"В браке":"Не состоит в браке",employmentMap[state.job]];
-let html='<div class="num screenonly">Готовый список для клиента</div><h2>Документы для подачи заявки</h2><div class="meta">'+chips.map(x=>'<span class="chip">'+esc(x)+'</span>').join('')+'</div><p class="muted small screenonly">Отметьте уже полученные документы — при копировании и печати они не войдут в список оставшихся.</p>';
-current.groups.forEach((g,gi)=>{html+='<div class="group"><h3>'+esc(g.heading)+'</h3><div class="docs">'+(g.docs.length?g.docs.map((x,i)=>'<label class="doc"><input type="checkbox" data-gi="'+gi+'" data-i="'+i+'"><span>'+esc(x)+'</span></label>').join(''):'<p class="muted">По выбранным параметрам перечень не заполнен в источнике.</p>')+'</div></div>'});
-if(current.notes.length)html+='<details class="detail screenonly"><summary>Важные примечания и инструкции из Google Таблицы</summary>'+current.notes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</details>';
-html+='<div class="actions screenonly"><button class="btn" id="copy" type="button">Скопировать список</button><button class="btn secondary" id="print" type="button">Скачать / распечатать PDF</button><button class="btn outline" id="reset" type="button">← Изменить ответы</button></div>';
-html+='<p class="disclaimer screenonly">Основано на рабочей таблице отдела. Требования конкретного банка могут отличаться. Для нестандартных случаев проверьте перечень с ипотечным брокером. <a href="'+esc(D.source)+'" target="_blank" rel="noopener">Исходная Google Таблица ↗</a></p>';
-$('#result').innerHTML=html;
-document.querySelectorAll('.doc input').forEach(el=>el.onchange=()=>{const key=current.groups[+el.dataset.gi].heading+":"+el.dataset.i;el.checked?state.done.add(key):state.done.delete(key);el.parentElement.classList.toggle('done',el.checked)});
-$('#copy').onclick=()=>copyText(buildPlain());$('#print').onclick=()=>window.print();$('#reset').onclick=()=>goStep(0);scrollTo({top:0,behavior:"smooth"});
-}
-function copyText(t){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(t).then(()=>toast("Список скопирован"),()=>fallback(t));}else fallback(t)}
-function fallback(t){const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.append(a);a.select();document.execCommand("copy");a.remove();toast("Список скопирован")}
-function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2400)}
-state.spouseChoice="no";render();
+showStep();
 </script></body></html>
