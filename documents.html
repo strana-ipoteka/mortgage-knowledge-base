@@ -55,7 +55,7 @@ function docGroups(){
    const rf=["Номер телефона супруга или супруги, привязанный к Госуслугам","Паспорт супруга или супруги — все страницы, включая пустые (9 разворотов)","СНИЛС супруга или супруги","ИНН супруга или супруги"];
    const foreign=lines(D.programs.standard.personal.foreign).map(x=>x.replace(/иностранного гражданина/i,"второго участника сделки — иностранного гражданина"));
    const spouseDocs=state.program==="standard"&&state.citizenship==="foreign"&&state.spouseCitizenship==="foreign"?foreign:rf;
-   groups.push({title:"Документы супруга или супруги, участвующего(-ей) в заявке",docs:spouseDocs});
+   groups.push({title:"Документы второго участника сделки (супруга или супруги)",docs:spouseDocs});
  }
  groups.push({title:"Занятость и подтверждение дохода",docs:lines(b.list)});
  // Исключаем повторный запрос одного и того же документа в разных блоках.
