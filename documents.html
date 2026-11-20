@@ -52,11 +52,11 @@ function qs(){
  {key:"marital",title:"Какое семейное положение у клиента?",hint:"Для супругов могут потребоваться дополнительные документы.",opts:[["single","Не состоит в браке","◯"],["married","Состоит в браке","♡"]]}
  ];
  if(state.program==="standard")q.push({key:"citizenship",title:"Какое гражданство у заёмщика?",hint:"В источнике есть отдельный комплект для иностранного гражданина.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
- if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли второй супруг (супруга) участвовать в заявке?",hint:"Если второй супруг или супруга участвует в заявке, необходимые документы будут добавлены в итоговый список.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
+ if(state.marital==="married"&&state.program!=="family")q.push({key:"spouse",title:"Будет ли второй супруг (супруга) участвовать в заявке?",hint:"При участии обоих супругов необходимые документы будут добавлены в итоговый список.",opts:[["yes","Да, будет участвовать","✓"],["no","Нет","×"]]});
  if(state.program==="standard"&&state.marital==="married"&&state.spouse==="yes"&&state.citizenship==="foreign")q.push({key:"spouseCitizenship",title:"Какое гражданство у второго участника сделки (супруга или супруги)?",hint:"Перечень документов зависит от гражданства второго участника сделки.",opts:[["rf","Гражданство РФ","▣"],["foreign","Иностранное гражданство","◎"]]});
  if(state.program==="family")q.push({key:"capital",title:"Материнский капитал используется в первоначальном взносе?",hint:"При использовании маткапитала потребуются дополнительные документы.",opts:[["yes","Да, используем","✓"],["no","Нет","×"]]});
  const employmentChoices=state.program==="it"?[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"]]:[["official","По найму · официальный доход","▤"],["partial","По найму · доход частично неофициальный","▥"],["company","ООО","▦"],["ip_usn","ИП · УСН","◈"],["ip_patent","ИП · патент","◈"],["self","Самозанятый","◇"]];
- q.push({key:"job",title:"Как клиент подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите подходящую категорию занятости.",opts:employmentChoices});
+ q.push({key:"job",title:"Как заёмщик подтверждает занятость и доход?",hint:state.program==="it"?"В таблице для IT-ипотеки указаны два варианта подтверждения дохода.":"Выберите подходящую категорию занятости.",opts:employmentChoices});
  const bothSpouses=state.marital==="married"&&(state.program==="family"||state.spouse==="yes");
  if(bothSpouses){
    q.push({key:"spouseIncome",title:"Будет ли супруг(а) подтверждать доход?",hint:"Если доход второго участника сделки учитывается в заявке, добавим его подтверждающие документы.",opts:[["yes","Да, с подтверждением дохода","✓"],["no","Нет, без подтверждения дохода","×"]]});
@@ -74,7 +74,7 @@ function showStep(){
  $('#prev').onclick=()=>{if(state.idx>0){state.idx--;showStep()}};
  $('#next').onclick=()=>{if(state.idx===qs().length-1)showResult();else{state.idx++;showStep()}};
 }
-function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция как выгрузить документы из Госуслуг:|\n\s*Имейте в виду, что в дальнейшем для сделки потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
+function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция: как выгрузить документы из Госуслуг:|\n\s*Имейте в виду, что в дальнейшем для сделки потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
 function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim()).map(x=>x.replace(/^([а-яё])/u,(_,letter)=>letter.toLocaleUpperCase("ru-RU")))}
 function docGroups(){
  const p=D.programs[state.program];let personal="";
