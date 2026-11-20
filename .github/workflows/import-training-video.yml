@@ -1,0 +1,51 @@
+name: Import training video to the website
+
+on:
+  push:
+    paths:
+      - .github/workflows/import-training-video.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Download the existing public training video once
+        run: |
+          python -m pip install --disable-pip-version-check gdown==5.2.0
+          mkdir -p media
+          gdown --id "1dL6OHblVYCGFqwHfMgt66kaFl3w5BNVp" -O media/banki-3-training.mp4
+          test -s media/banki-3-training.mp4
+          file media/banki-3-training.mp4
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("media/banki-3-training.mp4")
+          count = path.stat().st_size
+          if not (10_000_000 < count < 80_000_000):
+              raise SystemExit(f"Unexpected video size: {count}")
+          with path.open("rb") as f:
+              signature = f.read(32)
+          if b"ftyp" not in signature:
+              raise SystemExit("Downloaded content is not an MP4 video")
+          print(f"Verified MP4: {count:,} bytes")
+          PY
+
+      - name: Save video in GitHub Pages source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media/banki-3-training.mp4
+          if git diff --cached --quiet; then
+            echo "Training video already exists"
+          else
+            git commit -m "Add self-hosted Banks 3.0 training MP4"
+            git push
+          fi
