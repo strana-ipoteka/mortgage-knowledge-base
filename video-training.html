@@ -31,7 +31,7 @@ header{background:#fff;border-bottom:1px solid var(--line)}
 .panel h2{font-size:clamp(23px,3vw,30px);letter-spacing:-.03em;line-height:1.2;margin:10px 0}
 .intro{color:var(--muted);font-size:14px;margin:0 0 24px}
 .video-frame{border:1px solid var(--line);overflow:hidden;border-radius:17px;background:#171923;aspect-ratio:16/9}
-.video-frame iframe{height:100%;width:100%;border:0;display:block}
+.video-frame video{height:100%;width:100%;border:0;display:block;background:#171923;object-fit:contain}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:49px;border-radius:12px;padding:13px 22px;text-decoration:none;font-size:14px;font-weight:750;background:#9b287f;color:#fff}
 .btn.secondary{background:#f3eef3;color:#5d4760}
@@ -51,8 +51,8 @@ header{background:#fff;border-bottom:1px solid var(--line)}
 <main class="page">
 <div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Видеообучение по Банки 3.0</h1><p>Обучающий видеоролик по работе с банковской памяткой и условиями ипотеки.</p></div><div class="softmark">▶</div></div>
 <div class="layout">
-<aside class="sidebar"><h3>Обучающие материалы</h3><div class="navstep"><span class="dot">▶</span><span>Видео по Банки 3.0</span></div><div class="sidetip">Продолжительность: 14 минут 57 секунд. Видео можно развернуть на весь экран и открыть в отдельной вкладке.</div></aside>
+<aside class="sidebar"><h3>Обучающие материалы</h3><div class="navstep"><span class="dot">▶</span><span>Видео по Банки 3.0</span></div><div class="sidetip">Продолжительность: 14 минут 57 секунд. Видео воспроизводится с сайта без Google Диска. Можно развернуть его на весь экран и скачать.</div></aside>
 <section class="panel"><div class="counter">Видеообучение · 14:57</div><h2>Работа с памяткой «Банки 3.0»</h2><p class="intro">Нажмите кнопку воспроизведения, чтобы посмотреть обучающее видео.</p>
-<div class="video-frame"><iframe src="https://drive.google.com/file/d/1dL6OHblVYCGFqwHfMgt66kaFl3w5BNVp/preview" title="Видеообучение по Банки 3.0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
-<div class="actions"><a class="btn" href="https://drive.google.com/file/d/1dL6OHblVYCGFqwHfMgt66kaFl3w5BNVp/view" target="_blank" rel="noopener">↗ Открыть видео отдельно</a><a class="btn secondary" href="https://drive.google.com/uc?export=download&amp;id=1dL6OHblVYCGFqwHfMgt66kaFl3w5BNVp" target="_blank" rel="noopener">↓ Скачать видео</a></div>
+<div class="video-frame"><video controls preload="metadata" playsinline aria-label="Видеообучение по Банки 3.0"><source src="./media/banki-3-training.mp4" type="video/mp4">Ваш браузер не поддерживает встроенное воспроизведение MP4. Скачайте видео по ссылке ниже.</video></div>
+<div class="actions"><a class="btn" href="./media/banki-3-training.mp4" target="_blank" rel="noopener">↗ Открыть видео отдельно</a><a class="btn secondary" href="./media/banki-3-training.mp4" download="Видеообучение-Банки-3.0.mp4">↓ Скачать видео</a></div>
 </section></div></main></body></html>
