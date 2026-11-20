@@ -5,12 +5,9 @@
   function stored() {
     try { return localStorage.getItem(KEY); } catch (e) { return null; }
   }
-  function preferred() {
-    return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
-  }
   function current() {
     var value = stored();
-    return value === "dark" || value === "light" ? value : preferred();
+    return value === "dark" || value === "light" ? value : "light";
   }
   function apply(value) {
     document.documentElement.setAttribute("data-theme", value);
@@ -36,10 +33,4 @@
   window.addEventListener("storage", function (e) {
     if (e.key === KEY) apply(current());
   });
-  if (window.matchMedia) {
-    var mq = window.matchMedia("(prefers-color-scheme: dark)");
-    if (mq.addEventListener) mq.addEventListener("change", function () {
-      if (!stored()) apply(preferred());
-    });
-  }
 }());
