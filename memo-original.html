@@ -132,7 +132,7 @@ function filt(sec,st,ctx){
 //ENDCORE
 const $=s=>document.querySelector(s),app=$('#app');
 const st={q:'',banks:new Set()};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/"([А-Яа-яЁё][^"\n]{1,90})"/g,'«$1»').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function hl(s){const t=toks(st.q),re=t.length?new RegExp('('+t.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
  return String(s).split(/(https?:\/\/\S+)/).map((p,i)=>i%2?`<a href="${esc(p)}" target="_blank" rel="noopener">открыть ссылку ↗</a>`:(re?p.split(re).map((x,k)=>k%2?'<mark>'+esc(x)+'</mark>':esc(x)).join(''):esc(p))).join('').replace(/\n/g,'<br>')}
 function val(v){const k=norm(v).trim();
