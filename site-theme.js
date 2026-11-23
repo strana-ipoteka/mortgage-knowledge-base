@@ -22,6 +22,21 @@
   }
   apply(current());
   document.addEventListener("DOMContentLoaded", function () {
+    // Возврат на предыдущую страницу сайта, с безопасным переходом к разделам.
+    document.querySelectorAll("[data-site-back]").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        var previous = document.referrer;
+        if (previous) {
+          try {
+            var url = new URL(previous);
+            if (url.origin === location.origin && history.length > 1) {
+              event.preventDefault();
+              history.back();
+            }
+          } catch (err) {}
+        }
+      });
+    });
     apply(current());
     var toggle = document.getElementById("theme");
     if (toggle) toggle.addEventListener("click", function () {
