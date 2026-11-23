@@ -12,13 +12,10 @@
   function apply(value) {
     document.documentElement.setAttribute("data-theme", value);
     document.documentElement.style.colorScheme = value;
-    var toggle = document.getElementById("theme");
-    if (toggle) {
-      toggle.setAttribute("aria-label", value === "dark" ? "Включить светлую тему" : "Включить тёмную тему");
-      toggle.setAttribute("aria-pressed", value === "dark" ? "true" : "false");
-      toggle.title = value === "dark" ? "Сейчас тёмная тема. Переключить на светлую" : "Сейчас светлая тема. Переключить на тёмную";
-      toggle.textContent = value === "dark" ? "☀ Тема" : "◐ Тема";
-    }
+    document.querySelectorAll(".sw button[data-t]").forEach(function (button) {
+      var selected = button.getAttribute("data-t") === value;
+      button.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
   }
   apply(current());
   document.addEventListener("DOMContentLoaded", function () {
@@ -38,11 +35,13 @@
       });
     });
     apply(current());
-    var toggle = document.getElementById("theme");
-    if (toggle) toggle.addEventListener("click", function () {
-      var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      try { localStorage.setItem(KEY, next); } catch (e) {}
-      apply(next);
+    document.querySelectorAll(".sw button[data-t]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var next = button.getAttribute("data-t");
+        if (next !== "dark" && next !== "light") return;
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        apply(next);
+      });
     });
   });
   window.addEventListener("storage", function (e) {
