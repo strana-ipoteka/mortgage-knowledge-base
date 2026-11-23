@@ -1,0 +1,95 @@
+/* Визуальная система «База знаний УОиИ» — mikhailshevelev-dotcom/UOiI. */
+:root{
+  --graphite:#29303E;--purple:#951B81;
+  --grad:linear-gradient(90deg,#831F82 0%,#C7017F 60%,#E30613 100%);
+  --bg:#F4F5F9;--surface:#FFFFFF;--text:#29303E;--muted:#6A7080;--line:#DFE2EA;
+  --tile:#29303E;--tile-text:#FFFFFF;--tile-muted:#B5BAC7;--accent:#951B81;
+  --ink:#29303E;--sf:#FFFFFF;--tx:#29303E;--mu:#6A7080;--ln:#DFE2EA;--bb:#951B81;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#1B2029;--surface:#252B38;--text:#F1F2F6;--muted:#9EA4B4;--line:#363D4D;
+  --tile:#2F3747;--tile-text:#FFFFFF;--tile-muted:#B5BAC7;--accent:#E04DC4;--purple:#E04DC4;
+  --ink:#F1F2F6;--sf:#252B38;--tx:#F1F2F6;--mu:#9EA4B4;--ln:#363D4D;--bb:#E04DC4;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.5 Montserrat,"Segoe UI",Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font-family:inherit}
+header{background:var(--surface)!important;border-bottom:1px solid var(--line)!important;position:sticky;top:0;z-index:5}
+.bar,.headinner,.memo-return{max-width:1040px;margin:0 auto;padding:14px 20px;box-sizing:border-box}
+.bar,.headinner{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.bar nav,.nav,.headtools,.memo-headtools{display:flex;align-items:center;gap:10px}
+.logo{height:26px;width:auto;max-width:200px;object-fit:contain}
+.wordmark,.memo-wordmark{font-size:14px;letter-spacing:0;text-transform:none;color:var(--text);font-weight:600}
+.nav a,.nav button{color:var(--text);font:600 14px Montserrat,sans-serif;border-radius:10px;padding:8px 12px}
+.nav a:hover{background:rgba(149,27,129,.12);color:var(--accent)}
+.stripe{height:4px;background:var(--grad)}
+.sw{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;background:var(--bg);padding:3px;flex-shrink:0}
+.sw button{font:600 13px Montserrat,sans-serif;min-height:36px;padding:0 13px;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+.sw button[aria-pressed="true"]{color:#fff;background:var(--grad)}
+.sw button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main,main.page{max-width:1040px;margin:0 auto;padding:36px 20px 64px}
+h1,.pagehead h1{font-size:clamp(28px,5vw,44px);font-weight:700;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px}
+h2,h3{font-weight:700}
+.lead,.pagehead p{color:var(--muted);line-height:1.5}
+.lead{font-size:clamp(16px,2.4vw,20px);max-width:34em;margin:0 0 28px}
+.rule{height:6px;width:120px;border-radius:3px;background:var(--grad);margin:0 0 28px}
+.crumbs{font-size:14px;color:var(--muted)}
+.grid{grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.grid .card,.card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--purple);border-radius:14px;padding:18px 20px;min-height:104px;gap:6px;box-shadow:none}
+.card b{font-size:17px;line-height:1.3;font-weight:600}
+.card small{font-size:13px;color:var(--muted)}
+a.card:hover,.card:hover:not(.off){border-color:var(--accent);box-shadow:0 6px 18px rgba(41,48,62,.12)}
+.card.off{border-left-color:var(--line);background:transparent;border-style:dashed}
+.back,.memo-return a[data-site-back]{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;background:var(--tile)!important;color:#fff!important;font-weight:600;font-size:15px;text-decoration:none}
+.back:hover,.memo-return a[data-site-back]:hover{filter:brightness(1.15)}
+.panel,.sidebar,.summary,.viewer,.video-frame{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:none}
+.page .panel{min-height:0}
+.page .sidebar{border-radius:14px}
+.pagehead{margin-bottom:28px}
+.eyebrow{color:var(--accent);font-weight:700}
+.softmark{background:var(--surface);border:1px solid var(--line);color:var(--accent);border-radius:14px}
+.navstep.current,.navstep,.sidetip{border-radius:10px}
+.btn,.page .btn,.button{min-height:44px;border-radius:12px;font-size:14px;font-weight:600}
+.btn:not(.secondary):not(.outline),.button:not(.alt){background:var(--tile);color:#fff}
+.btn.secondary,.btn.outline,.button.alt{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.page .questiontitle{font-weight:700}
+.choice,.page .choice{border-radius:14px;background:var(--surface);color:var(--text);border-color:var(--line)}
+.choice.selected{background:rgba(149,27,129,.09);border-color:var(--accent)}
+.choiceicon,.choice.selected .choiceicon{color:var(--accent)}
+.summaryheader{background:var(--surface)}
+.chip{background:var(--bg);color:var(--text);border-color:var(--line)}
+:root[data-theme="dark"] header,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .summary,:root[data-theme="dark"] .choice,:root[data-theme="dark"] .viewer{background:var(--surface)!important;border-color:var(--line)!important;color:var(--text)}
+:root[data-theme="dark"] .summaryheader{background:var(--surface)!important}
+:root[data-theme="dark"] .wordmark,:root[data-theme="dark"] .memo-wordmark,:root[data-theme="dark"] .back{color:inherit}
+:root[data-theme="dark"] .back{color:#fff}
+:root[data-theme="dark"] .nav a{color:var(--text)}
+:root[data-theme="dark"] .nav a:hover{color:var(--accent)}
+:root[data-theme="dark"] .btn:not(.secondary):not(.outline){background:var(--tile);color:#fff}
+:root[data-theme="dark"] .btn.secondary,:root[data-theme="dark"] .btn.outline{background:var(--bg);border-color:var(--line);color:var(--text)}
+:root[data-theme="dark"] .pagehead p{color:var(--muted)}
+/* Банковская памятка: сохраняем поиск и таблицы, унифицируем оболочку */
+.memo-return{max-width:none;padding:14px max(20px,calc((100vw - 1040px)/2 + 20px));min-height:70px;z-index:8;background:var(--surface);border-bottom:1px solid var(--line)}
+.memo-return .memo-wordmark{color:var(--text)}
+.memo-return .sw{margin-left:auto}
+.brand,.top .bar,.bar2,.top .panel{max-width:1040px}
+.top{background:var(--bg);border-color:var(--line)}
+.top .btn{background:var(--surface);color:var(--text);border-color:var(--line)}
+.top .sr input{background:var(--surface);color:var(--text);border-color:var(--line)}
+body:has(.memo-return) main{max-width:1040px;padding:22px 20px 64px}
+body:has(.memo-return) .tiles .tile{border-radius:14px;background:var(--surface);color:var(--text);border-left:5px solid var(--purple);box-shadow:none}
+body:has(.memo-return) .tiles .tile small{color:var(--muted)}
+body:has(.memo-return) .hero{border-radius:14px}
+body:has(.memo-return) .chip{border-radius:20px}
+@media(max-width:670px){
+  .bar,.headinner,.memo-return{padding:14px}
+  .bar{flex-direction:column;align-items:flex-start;gap:8px}
+  .nav{width:100%;flex-wrap:wrap;justify-content:flex-start}
+  main,main.page{padding:26px 14px 45px}
+  .headtools,.memo-headtools{gap:7px}
+  .wordmark,.memo-wordmark{font-size:11px}
+  .sw button{padding:0 10px;min-height:32px;font-size:12px}
+  .grid{grid-template-columns:1fr}
+}
+@media print{.sw{display:none!important}.back{display:none!important}}
