@@ -2,6 +2,9 @@
 (function () {
   "use strict";
   var KEY = "strana-ipoteka-theme";
+  if (new URLSearchParams(window.location.search).get("embedded") === "1") {
+    document.documentElement.classList.add("embedded-page");
+  }
   function stored() {
     try { return localStorage.getItem(KEY); } catch (e) { return null; }
   }
