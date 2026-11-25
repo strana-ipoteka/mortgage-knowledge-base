@@ -99,6 +99,7 @@ html.embedded-page header,
 html.embedded-page body > .stripe,
 html.embedded-page .memo-return,
 html.embedded-page .brand{display:none!important}
+html.embedded-page header.top{display:block!important;position:relative!important;top:auto!important;border:0!important;background:var(--bg)!important}
 html.embedded-page,
 html.embedded-page body{background:transparent!important}
 html.embedded-page main,
