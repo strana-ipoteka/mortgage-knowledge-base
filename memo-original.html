@@ -163,7 +163,7 @@ function home(){
   h+=`<div class="info">Результаты: <b>${any}</b>${st.q.trim()?` · запрос «${esc(st.q.trim())}»`:''}${st.banks.size?` · банки: ${esc(names())}`:''}</div>`;
   h+=s||'<div class="empty">Ничего не найдено. Попробуйте другое слово или уберите часть банков.</div>';
   return h}
- h+=`<div class="big">${D.groups.map((g,gi)=>`<button class="bg g${gi}" data-g="${gi}"><b>${g[0]}</b><small>${g[1]}</small></button>`).join('')}</div><button class="lk" id="lk">Важные ссылки <span aria-hidden="true">▾</span></button>`;
+ h+=`<div class="big">${D.groups.map((g,gi)=>`<button class="bg g${gi}" data-g="${gi}"><b>${g[0]}</b><small>${g[1]}</small></button>`).join('')}</div>`;
  return h+'<footer>Источник — файл «Банки_России_3_0.xlsx». Данные приведены как в файле; перед сделкой уточняйте актуальность условий в банке.</footer>'}
 function section(id){
  const sec=D.secs.find(s=>s.id===id);if(!sec) return home();
@@ -184,9 +184,6 @@ function toast(m){let e=$('#ts');if(!e){e=document.createElement('div');e.id='ts
 app.addEventListener('click',e=>{const b=e.target.closest('.cp');if(!b)return;const n=b.dataset.p,ok=()=>toast('Скопировано '+n+'. В Max: Контакты → «+» → «Найти по номеру»');
  const fb=()=>{const x=document.createElement('textarea');x.value=n;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(_){}x.remove();ok()};
  navigator.clipboard?navigator.clipboard.writeText(n).then(ok,fb):fb()});
-const LINKS=[['Документы для оформления','https://strana-development.github.io/Pamyatka/'],['Ипотечный калькулятор','https://strana-ipoteka.github.io/strana-semeynaia-ipoteka.github.io/']];
-app.addEventListener('click',e=>{if(!e.target.closest('#lk'))return;$('#mb').innerHTML='<h2>Важные ссылки</h2><div class="tiles">'+LINKS.map(l=>`<a class="tile" href="${l[1]}" target="_blank" rel="noopener"><b>${l[0]} ↗</b></a>`).join('')+'</div>';$('#md').classList.add('on')});
-const closeM=()=>$('#md').classList.remove('on');
 app.addEventListener('click',e=>{const b=e.target.closest('.bg');if(!b)return;const gi=+b.dataset.g,g=D.groups[gi];
  $('#mb').innerHTML=`<h2>${g[0]}</h2><p class="sub">${g[1]}</p><div class="tiles g${gi}">`+D.secs.filter(s=>s.g===gi).map(s=>`<a class="tile" href="#${s.id}"><b>${esc(s.t)}</b><small>${esc(s.d)}</small></a>`).join('')+'</div>';$('#md').classList.add('on')});
 $('#mx').onclick=closeM;$('#md').onclick=e=>{if(e.target.id==='md'||e.target.closest('.tile'))closeM()};addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
