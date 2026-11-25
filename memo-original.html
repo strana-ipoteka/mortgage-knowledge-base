@@ -184,6 +184,7 @@ function toast(m){let e=$('#ts');if(!e){e=document.createElement('div');e.id='ts
 app.addEventListener('click',e=>{const b=e.target.closest('.cp');if(!b)return;const n=b.dataset.p,ok=()=>toast('Скопировано '+n+'. В Max: Контакты → «+» → «Найти по номеру»');
  const fb=()=>{const x=document.createElement('textarea');x.value=n;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(_){}x.remove();ok()};
  navigator.clipboard?navigator.clipboard.writeText(n).then(ok,fb):fb()});
+const closeM=()=>$('#md').classList.remove('on');
 app.addEventListener('click',e=>{const b=e.target.closest('.bg');if(!b)return;const gi=+b.dataset.g,g=D.groups[gi];
  $('#mb').innerHTML=`<h2>${g[0]}</h2><p class="sub">${g[1]}</p><div class="tiles g${gi}">`+D.secs.filter(s=>s.g===gi).map(s=>`<a class="tile" href="#${s.id}"><b>${esc(s.t)}</b><small>${esc(s.d)}</small></a>`).join('')+'</div>';$('#md').classList.add('on')});
 $('#mx').onclick=closeM;$('#md').onclick=e=>{if(e.target.id==='md'||e.target.closest('.tile'))closeM()};addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
