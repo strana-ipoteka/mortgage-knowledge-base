@@ -37,6 +37,12 @@ h2{letter-spacing:-.025em}
 :root[data-theme="dark"] .card,:root[data-theme="dark"] .panel{box-shadow:none}
 @media(max-width:670px){.bar{padding:14px}.nav{flex-wrap:wrap}.nav a,.nav button{padding:8px 10px}main{padding:22px 14px 45px}}
 
+
+/* Внутренние HTML-разделы отображаются внутри базы знаний по адресу /#раздел. */
+.embedded-section{width:100%;min-width:0}
+.embedded-nav{display:flex;align-items:center;margin-bottom:18px}
+.embedded-frame{display:block;width:100%;min-height:480px;height:640px;border:0;background:transparent;overflow:hidden}
+@media(max-width:670px){.embedded-nav{margin-bottom:10px}}
 </style>
 <link rel="stylesheet" href="./site-consistency.css?v=1"><link rel="stylesheet" href="./uoii-reference-style.css?v=1"></head><body><header><div class="bar"><a href="#home" aria-label="На главную"><img class="logo" alt="Страна" src="data:image/png;base64,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"></a><nav class="nav"><a href="https://mikhailshevelev-dotcom.github.io/UOiI/#home" target="_blank" rel="noopener noreferrer">Главная</a><a href="#home">Отдел ипотеки</a><a href="https://mikhailshevelev-dotcom.github.io/UOiI/#registration" target="_blank" rel="noopener noreferrer">Отдел оформления</a><div class="sw" role="group" aria-label="Тема оформления"><button type="button" data-t="light" aria-pressed="true">Светлая</button><button type="button" data-t="dark" aria-pressed="false">Тёмная</button></div></nav></div><div class="stripe"></div></header><main id="app"></main><footer>База знаний отдела ипотеки · Материалы для менеджеров · Информация требует проверки актуальности</footer>
 <script>
@@ -54,7 +60,7 @@ const term=homeQuery.trim().toLocaleLowerCase('ru');
 const matchingFaq=term&&FAQ.some(t=>t.topic.toLocaleLowerCase('ru').includes(term)||t.qa.some(x=>(x.q+' '+x.a).toLocaleLowerCase('ru').includes(term)));
 const items=SECTIONS.filter(s=>!term||(s.title+' '+s.desc).toLocaleLowerCase('ru').includes(term)||(s.id==='faq'&&matchingFaq));
 document.getElementById('main-search-count').textContent=term?'Найдено разделов: '+items.length:'Все разделы: '+SECTIONS.length;
-document.getElementById('section-grid').innerHTML=items.length?items.map(s=>s.pending?'<div class="card off"><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small><span class="pill">В подготовке</span></div>':'<a class="card" href="'+(s.internal?'#'+s.id:esc(s.url))+'"'+(s.internal||s.url.startsWith('./')?'':' target="_blank" rel="noopener noreferrer"')+'><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small></a>').join(''):'<div class="empty">По вашему запросу ничего не найдено. Попробуйте другое слово.</div>';
+document.getElementById('section-grid').innerHTML=items.length?items.map(s=>s.pending?'<div class="card off"><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small><span class="pill">В подготовке</span></div>':'<a class="card" href="'+(s.internal||s.url.startsWith('./')?'#'+s.id:esc(s.url))+'"'+(s.internal||s.url.startsWith('./')?'':' target="_blank" rel="noopener noreferrer"')+'><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small></a>').join(''):'<div class="empty">По вашему запросу ничего не найдено. Попробуйте другое слово.</div>';
 }
 function layout(title,body){app.innerHTML='<a class="back" href="#home">← Назад к разделам</a><p class="crumbs">Отдел ипотеки / '+esc(title)+'</p><h1>'+esc(title)+'</h1><div class="rule"></div>'+body}
 function faq(){layout('Часто задаваемые вопросы','<p class="lead">73 вопроса по 7 темам. Найдите ответ по ключевым словам или выберите тему.</p><div class="notice">Ответы перенесены из рабочей таблицы. Банковские условия и законодательные требования необходимо сверять с актуальными первоисточниками перед применением.</div><div class="tools"><input id="search" type="search" placeholder="Поиск по вопросам и ответам…" aria-label="Поиск"><select id="topic" aria-label="Выберите тему"><option>Все темы</option>'+FAQ.map(s=>'<option>'+esc(s.topic)+'</option>').join('')+'</select></div><p id="matches" class="muted"></p><div id="results"></div>');document.getElementById('search').value=query;document.getElementById('topic').value=filter;document.getElementById('search').oninput=e=>{query=e.target.value;renderFaq()};document.getElementById('topic').onchange=e=>{filter=e.target.value;renderFaq()};renderFaq()}
@@ -63,6 +69,43 @@ function navigatorPage(){layout('Ипотечный навигатор','<p clas
 function calculators(){layout('Калькуляторы','<p class="lead">Инструменты для предварительного расчёта ипотеки.</p><div class="grid">'+CALCS.map(x=>'<a class="card" href="'+esc(x[1])+'" target="_blank" rel="noopener noreferrer"><b>'+esc(x[0])+'</b><small>Открыть калькулятор ↗</small></a>').join('')+'<div class="card off"><b>Комбо-ипотека</b><small>В исходной таблице указана папка Google без ссылки</small><span class="pill">В подготовке</span></div></div>')}
 function insurance(){layout('Страхование','<div class="grid"><section class="panel"><h2>Страховые партнёры</h2>'+INSURERS.map(x=>'<p>• '+esc(x)+'</p>').join('')+'</section><section class="panel"><h2>Страховые продукты</h2>'+RISKS.map(x=>'<p>• '+esc(x)+'</p>').join('')+'</section></div><div class="notice">Для оформления или продления полиса обратитесь к ипотечному брокеру. Контакт: broker@strana.com. Списки партнёров и продуктов не являются попарным соответствием.</div>')}
 function team(){layout('Структура отдела','<p class="lead">Отдел работает по направлениям «Восток» и «Запад».</p><div class="notice">Контакты и ФИО сотрудников из рабочей таблицы не опубликованы на общедоступном сайте. Для внутреннего справочника понадобится согласованный способ ограничить доступ.</div><div class="grid"><div class="panel"><h2>Восток</h2><p>Руководитель отдела</p><p>Ведущий ипотечный брокер</p><p>Ипотечные брокеры региона</p></div><div class="panel"><h2>Запад</h2><p>Руководитель отдела</p><p>Ведущий ипотечный брокер</p><p>Ипотечные брокеры региона</p></div></div>')}
-function route(){const id=decodeURIComponent(location.hash.slice(1)||'home');if(id==='home')home();else if(id==='faq')faq();else if(id==='navigator')navigatorPage();else if(id==='calculators')calculators();else if(id==='insurance')insurance();else if(id==='team')team();else home();window.scrollTo(0,0);}
+let embeddedResizeObserver=null;
+function embeddedSection(section){
+ if(embeddedResizeObserver){embeddedResizeObserver.disconnect();embeddedResizeObserver=null;}
+ app.innerHTML='<div class="embedded-section"><div class="embedded-nav"><a class="back" href="#home">← Назад к разделам</a></div><iframe class="embedded-frame" title="'+esc(section.title)+'" src="'+esc(section.url)+'?embedded=1" loading="eager"></iframe></div>';
+ const frame=app.querySelector('.embedded-frame');
+ frame.addEventListener('load',()=>{
+  if(!frame.isConnected)return;
+  try{
+   const child=frame.contentDocument;
+   if(!child||!child.body)return;
+   const resize=()=>{
+    if(!frame.isConnected)return;
+    const needed=Math.max(480,Math.ceil(child.body.getBoundingClientRect().height)+8);
+    if(Math.abs(frame.offsetHeight-needed)>3)frame.style.height=needed+'px';
+   };
+   resize();
+   if(window.ResizeObserver){
+    embeddedResizeObserver=new ResizeObserver(resize);
+    embeddedResizeObserver.observe(child.body);
+   }
+   frame.contentWindow.addEventListener('hashchange',resize);
+  }catch(error){frame.style.height='78vh';}
+ });
+}
+function route(){
+ const id=decodeURIComponent(location.hash.slice(1)||'home');
+ const section=SECTIONS.find(item=>item.id===id);
+ if(embeddedResizeObserver){embeddedResizeObserver.disconnect();embeddedResizeObserver=null;}
+ if(section&&section.url&&section.url.startsWith('./'))embeddedSection(section);
+ else if(id==='home')home();
+ else if(id==='faq')faq();
+ else if(id==='navigator')navigatorPage();
+ else if(id==='calculators')calculators();
+ else if(id==='insurance')insurance();
+ else if(id==='team')team();
+ else home();
+ window.scrollTo(0,0);
+}
 window.addEventListener('hashchange',route);route();
 </script></body></html>
