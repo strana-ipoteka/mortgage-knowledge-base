@@ -93,3 +93,20 @@ body:has(.memo-return) .chip{border-radius:20px}
   .grid{grid-template-columns:1fr}
 }
 @media print{.sw,.stripe{display:none!important}.back{display:none!important}}
+
+/* Режим встроенного HTML-раздела: общая шапка и кнопка «Назад» принадлежат базе знаний. */
+html.embedded-page header,
+html.embedded-page body > .stripe,
+html.embedded-page .memo-return,
+html.embedded-page .brand{display:none!important}
+html.embedded-page,
+html.embedded-page body{background:transparent!important}
+html.embedded-page main,
+html.embedded-page main.page,
+html.embedded-page body:has(.memo-return) main{max-width:none!important;padding:4px 2px 32px!important}
+html.embedded-page .pagehead{margin-top:0}
+html.embedded-page .top{position:relative!important;top:auto!important}
+html.embedded-page .sidebar{position:static!important}
+@media(max-width:670px){
+ html.embedded-page main,html.embedded-page main.page,html.embedded-page body:has(.memo-return) main{padding:4px 0 24px!important}
+}
