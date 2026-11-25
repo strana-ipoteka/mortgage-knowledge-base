@@ -155,7 +155,7 @@ const active=()=>st.q.trim()||st.banks.size;
 const names=()=>[...st.banks].map(b=>D.banks.find(x=>x.id===b).n).join(', ');
 function home(){
  const nb=D.banks.length,tot=D.secs.length;
- let h=`<div class="hero"><h1>Памятка «Банки России 3.0»</h1><p>Выберите раздел или найдите условие по ключевому слову и банку.</p></div>`;
+ let h=`<div class="memo-pagehead"><div class="memo-eyebrow">Справочник ипотечного брокера</div><h1>Памятка «Банки России 3.0»</h1><p>Выберите раздел или найдите условие по ключевому слову и банку.</p><div class="memo-rule" aria-hidden="true"></div></div>`;
  if(active()){
   let any=0,s='';
   D.secs.forEach(sec=>{const r=filt(sec,st,'res');if(!r.n)return;any+=r.n;
@@ -163,7 +163,7 @@ function home(){
   h+=`<div class="info">Результаты: <b>${any}</b>${st.q.trim()?` · запрос «${esc(st.q.trim())}»`:''}${st.banks.size?` · банки: ${esc(names())}`:''}</div>`;
   h+=s||'<div class="empty">Ничего не найдено. Попробуйте другое слово или уберите часть банков.</div>';
   return h}
- h+=`<div class="big">${D.groups.map((g,gi)=>`<button class="bg g${gi}" data-g="${gi}"><b>${g[0]}</b><small>${g[1]}</small></button>`).join('')}</div><button class="lk" id="lk">Важные ссылки <span>▾</span></button>`;
+ h+=`<div class="big">${D.groups.map((g,gi)=>`<button class="bg g${gi}" data-g="${gi}"><b>${g[0]}</b><small>${g[1]}</small></button>`).join('')}</div><button class="lk" id="lk">Важные ссылки <span aria-hidden="true">▾</span></button>`;
  return h+'<footer>Источник — файл «Банки_России_3_0.xlsx». Данные приведены как в файле; перед сделкой уточняйте актуальность условий в банке.</footer>'}
 function section(id){
  const sec=D.secs.find(s=>s.id===id);if(!sec) return home();
