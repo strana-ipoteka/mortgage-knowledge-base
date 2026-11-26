@@ -1,0 +1,15 @@
+.bank-logo {
+  display: inline-block;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-inline-end: .4rem;
+  border-radius: .35rem;
+  vertical-align: -.32rem;
+  background: url('./media/bank-logos.webp') var(--bank-logo-x) var(--bank-logo-y) / 800% 500% no-repeat;
+}
+
+.card h3 .bank-logo {
+  width: 1.65rem;
+  height: 1.65rem;
+  vertical-align: -.4rem;
+}
