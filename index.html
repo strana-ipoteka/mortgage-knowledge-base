@@ -43,6 +43,49 @@ h2{letter-spacing:-.025em}
 .embedded-nav{display:flex;align-items:center;margin-bottom:18px}
 .embedded-frame{display:block;width:100%;min-height:480px;height:640px;border:0;background:transparent;overflow:hidden}
 @media(max-width:670px){.embedded-nav{margin-bottom:10px}}
+
+/* FAQ — структура карточек и раскрывающихся вопросов как у отдела оформления */
+.faq-page{max-width:1040px;margin:0 auto}
+.faq-page .lead{max-width:760px;margin-bottom:18px}
+.faq-page .rule{margin-bottom:22px}
+.faq-search{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:0 14px;margin-bottom:14px}
+.faq-search:focus-within{border-color:var(--accent)}
+.faq-search-icon{font-size:25px;color:var(--muted);line-height:1}
+.faq-search input{width:100%;flex:1;min-width:0;border:0;background:transparent;color:var(--text);font:500 15px Montserrat,Arial,sans-serif;padding:15px 0;outline:0}
+.faq-search button{background:var(--bg);border:0;border-radius:8px;color:var(--accent);font-size:20px;width:30px;height:30px;cursor:pointer}
+.faq-search button[hidden]{display:none}
+.faq-count{color:var(--muted);font-size:13px;margin:0 0 14px}
+.faq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:20px}
+.faq-grid[hidden],.faq-search-results[hidden]{display:none}
+.faq-category{position:relative;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:10px;min-height:112px;padding:22px 44px 20px 23px;border:1px solid var(--line);border-left:5px solid var(--purple);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.faq-category:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(41,48,62,.15)}
+.faq-category-title{font-size:17px;line-height:1.35;font-weight:700}
+.faq-category-meta{font-size:13px;color:var(--muted)}
+.faq-category-arrow{position:absolute;right:18px;top:38px;color:var(--accent);font-size:28px}
+.faq-topic-back{display:inline-flex;align-items:center;color:var(--accent);font-weight:700;font-size:14px;text-decoration:none;margin:8px 0 14px}
+.faq-topic-back:hover{text-decoration:underline}
+.faq-breadcrumb{font-size:13px;color:var(--muted);margin:0 0 8px}
+.faq-topic-heading{font-size:clamp(22px,3vw,30px);margin:0 0 20px;line-height:1.2}
+.faq-topic-heading:after{content:"";display:block;width:90px;height:5px;border-radius:3px;background:var(--grad);margin-top:12px}
+.faq-band{background:var(--tile);color:#fff;border-radius:9px 9px 0 0;padding:14px 18px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.faq-band span:last-child{font-size:12px;font-weight:500;opacity:.8}
+.faq-list{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 9px 9px;padding:5px 14px 14px;margin-bottom:20px}
+.faq-question{border-bottom:1px solid var(--line)}
+.faq-question:last-child{border-bottom:0}
+.faq-question summary{list-style:none;position:relative;cursor:pointer;font-size:15px;font-weight:600;line-height:1.5;padding:15px 32px 15px 5px}
+.faq-question summary::-webkit-details-marker{display:none}
+.faq-question summary:after{content:"+";position:absolute;right:7px;top:12px;font-size:22px;color:var(--accent);font-weight:500}
+.faq-question[open] summary:after{content:"−"}
+.faq-question[open] summary{color:var(--accent)}
+.faq-answer{padding:0 5px 17px}
+.faq-answer-text{background:rgba(149,27,129,.07);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:14px 16px;white-space:pre-line;line-height:1.7;color:var(--text)}
+.faq-copy{margin-top:10px;padding:8px 14px;border:0;border-radius:999px;background:var(--tile);color:#fff;font:600 13px Montserrat,Arial,sans-serif;cursor:pointer}
+.faq-search-results{margin-bottom:24px}
+.faq-search-group{background:var(--surface);border:1px solid var(--line);border-radius:9px;margin-bottom:10px;padding:12px 16px}
+.faq-result-topic{display:block;font-size:12px;color:var(--accent);font-weight:700;margin:0 0 4px}
+.faq-disclaimer{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--muted);font-size:13px}
+:root[data-theme="dark"] .faq-answer-text{background:rgba(224,77,196,.12)}
+@media(max-width:670px){.faq-grid{grid-template-columns:1fr}.faq-category{padding:17px 40px 17px 16px;min-height:92px}.faq-category-title{font-size:15px}.faq-band{padding:12px 14px}.faq-list{padding:4px 10px 12px}}
 </style>
 <link rel="stylesheet" href="./site-consistency.css?v=1"><link rel="stylesheet" href="./uoii-reference-style.css?v=3"></head><body><header><div class="bar"><a href="#home" aria-label="На главную"><img class="logo" alt="Страна" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXgAAAAgCAIAAACXVfTfAAAOr0lEQVR42u1daWwd13U+987y9pV8FBdJpCxLslbKaWxIlmvZrpPIgZvATeo0Ngx0+ZG4KJygdQG3KNAGtQsUaBokaZ24SdECdjY7dZAoDeK9cl1HchyLpCxLkSlS4vZIieTbl1nuPf3x+N6beTPz+LhFEjUHBDGcucvcw3O+e+49554hiAguueSSS2tJ1GWBSy655AKNSy65dM2T2PwxZ7w4V5w5NXXpzEzxch74wn1S+Y31ayMRMN0n1ZLWug3FGsoAorV9azFr47b9RvZ0bv70XsEnZd6bGf/hECtp9ZK1Yoa3shmXobW2u7Z03LONesTCudmJZ06yokbsGNicRY3UULjpopY0aad5LUuzQkj2bokFb+nxbm0T/CKQJbbKkWWVwuB0YSCpjKVBX4vFONZ+E5thVJ+aekYCVlZWWFx5ZLpJAAFA3BBKfO4OIeavMCHz34OFY+dQZdViCFB5gvLWRPyPDtOAx/Z186+/l39pEBXN2pG8ozv68F3U73FiJi+UlFMXyieHtfEZVFmtX+NIiekOGiQTzePlgMYB2gwZqxdg+V29z03MNxcjFT0laOB/lVGRYOgvv0BDoWZAwxmfG54dem5g5LXhcqrIVIaM19SGGDSZWOTeeL9e3q6uIzAZgIaa9ZZYsIk4oIPpHRC6juzY+Ildgk8qjKXGnx/SM4oNHFibQntEEyPe9sNbqQeUZC75/JCWKoO5ShOgcUQfB6AhTYAGm8EQNMXKejEKRKTUKwX2dyY+uy96ZJsU9bYIN8pYZvYHp+ZfeF8dy/Cyjoy3go/LBJoaQBCzoFfEGtEo5cZHddGvtYOwoBtmpfJs74g/dECI+Su9ln41lvrOCSwq1R5rr4H+g1tjD94GDkCjnB5Pf/9Nni9X1bveUfDO3ZEHbgcr0CDqyfns82/kfvSmdvESllVkehUK0AwWSNDYJprHjgYksgJNYy0kC62ZC3AAIAsQw+tVDF0Y2I5AELD2krxyQTvbg3/2OWgCNEpOGfjeu0PPDeYm03pJX7AsEIlZCY1qT8zSTxwsmoa6YPnTCjS4SkDDVb2y842Ms5JutWiWBDSosYULjpXWiJ0yXxtAAwAALKNkXhvN/3IycvTsxsdu9+/rJGKzlTVXWero2cl/fqt8bpblVcJaMmSubqBBXtbA4B5BjWFJ5SXVCDSEIAKiojfxo1QqYkkFC9BwRbfBYsayPzmR+tejypmLmC8C4w2g0HhtBhqwAA00Ag3atFMFmmprjUADFqCx+UEA4FWgqRRbABosl2vMtAGacqb86pOvfPDSWSVTBo4rEA6XrjFCjenzpfmf/rp8PtX75D2RO/qILNijTFlPfu34zL/9Up3Koc5d1q2EuKKlv/Xz1FNH9ak51HUC69AR3DhlqQX19X989ezP3i+lSshdz/d1CTcKK5yaPv/oT/MDSVsQQZ1Nf+Pt6adOKBNZF2VWym3G0v/+4vzXf6xNzKLO1uswTUCDHH/17Dtnf35GySuuBFzXxFAZTV/8q5eUiYx1vsm8PJJ86m11Og/uVLRiKr5xOvXNn+nJ+fXNTBPQTJ9ODv5goJwugys/LnHMn5i4/OwgN2xmAQDLKeP/cEydzLooswp4ninMffkFfXx23TOzvkfDNHbyeyczUxl3xeTSgoWr8cvfHYx/cqd/V4IIC3PS5e8Olc7OwnW/YkLGeLHMPPbuFFS1Vmbr3NG3lcFR1PR1z646m7LJ7MibI7qiu1u/LtVIGU2nXxn2bo0LfgoArKjN/df7vKC6nCmfmZr4k29XHXONISra+Cwvq4tCVfb7x1iudD2wqw40F49fLKVKTWBYkAVf1EcFSkjd9duKextac2/XCy8xjgZsXePmXgBAjvsJJQBAvaK3K8QCsrFHLaOwgmI7fOoRPXEfIcTo/xbDnkUDTQglciJIBdKiexuuhHub5VU967xY5ph9bbTjof2CTwICpfcvl4fnkDmaM0QkYtzv5KuCFbq3awFjLbm3wcm9zYplni7DyjYIeLZcPH6+wlDSGOoCyDngIkaf+kFSOTcJzhvARBRoNEg8oiWOBprG0YBdHA1aovKqDumqe5uYWjDG0Rg6snrKCwWeTi/KzDrQTA1OMpU5SUff7Vv2P/hb4Z4IdYitaD1Q1RrV1rr8EWytcTuSQh4xIANA+62bb/3Wpxu0ZeSbxyd/dJqXbIzY0K6OXX//ESniNSKalAhQn7QIc6O+PU/fL7f7lyTBZFWLLUp6Vkm/cv7St9/R5oq20lI8c1lPlcR2PyGkOJRkOcVJqHy7Orq/eMC7M0E90hrFRBCr6NjfqZW3eTT/wsDs19/gxZV5PBBRZwbUW9BVrKnlYhwoD47wguM7yNs3xh75Xc++LcQrE2fkdRAGbAFGcVHu2YVfN16XfvJi7itPYzHfKtCkLqS4w0zVsbvr8OO/03Zjgkp0reV+DYmQikUjhT1isL3x/9oWIA4mihiQgzcl5JjPtrVmHUo0sKPd0xW8qtnCIdjfCYjJfznOC5rNxJvMsYIKiACkNJxCzV5IhIin78tHggc2Uo94lUuDfHwUhCt/yk8bnXEyZ0jIl3jiD/2/vZf4PEs+EbJEI3Glo3h3qBVm1oFGySpO28A33Lk12hcXveI6WS8SQgRivddkGiWUkmWJJhEIofSqVjwBBMnTdv+uy88OqEW7LUyda5fywBAEYNmyk38kdHCzv3+D4JevgTmHXhWvqM9lkdujtndPn/fD22nQt2Yos4ra1JJeUKMl6FTIE/RQwT3nvZ5J8EtNkBRZVTichYQGJCIKbhT5EiwKZ/cu8XmIKF4DKNM6ttdFzeM4sAv/O1JKl9wUWetY4tPHLugZhy1hQqREoGIDUq/kJCT5t8a0ZM6NjWidxLDfyY5Wz4xp45eabLpfe4OtXUU3RZOnprjdmnHy3fET3/i//j+42e+8kdE69q4EpckKlpbUI0hhL7miZjNTGMuU4WqCbNR59tiF6a/9guXs3bFSu18IyBV8kXsjRHTQjZnC2N+80vXnh7x9URDob3YzuNn4iCgKMR+hV511IPV2gGjvntNnUrN/90z8i78n39gNguDooXTUqVZYtKwyhAjtcaB0+UDTtafz3Mu/5naOJ72kn3pu8ML/nPeFvUBNJ5tbdG/DMt3b5j/NPVq5TJzz0RCAtkO9O//iDinouYKylT05NfrE6yyrgHNKmhaT16yKexsAUOPKeFpPO26+eG6MCzFfZX7x791A/ZI9JHFMvzhcHJgWE/4mu4O/efe256aOTf/0CTHmv9qAxrunj3ok+91gjsVjg8rpUbEjCgK1c29Do9cZwc69bfaCAzQ9821ktb17m4aDiWe+Sttiywea3gO9ckDWHGKx9JKWvpjKUhuwWMs0EQCAq5WPxtsTRnaFTQmWLefem2bzJWiaWMsmr42zfUeWpNK25ZuyJXJ7rxhasGgCezvlrpA2W7StgipTJjLKVJasiUm78OrEDDRQ82FjQyTIwiMEWIuTn8QnST3xyorSmlOKzedYapFTGvLuzcLGNjafA8bsmKnryTl9JrX0fDRgjqMx3llpPhohHkF9OXHMdaCJ39DWvb9n5PVhrjlE0yAia834wqXfQfseG5/gUmzABsc/xyu/ZkFAho54V7Xg0GIGop26VnKqoIMyo4NFg0vReTHui350K606HMW4L3rv9tIHc7aO8IV3Zs24TJa59q3no0GLRYNViwYblQ0QENZmdvHu6un+6sNC1N5QSv/Ha/NPv9w8VId65eC9t6TOTWGh5MxMvtb5aGAp+WiQLfN8ed1ckHzSzZ+52Rv1urt0LtUodt8O3+4NtQxYhJINf/whaUPQ9S4RryRvbpf7Omx/hHhocSc6geiDh6XeBND1z01q2OUhfQd7d3zsJtEnugrmEgB4t8a7HrlVjJjSesqbIt2PHhQinuucOQRIJWjT9qfFRqRNifif3ifEguueXaZNO8kn3/bIoe7+jVR0o2audxKi3o1futu3M9GQ0JNQknhoX/undgt+yeXSStFKoOH7D0YevIsE1vlKgjagdLgr/JG//eimWza7WHM9k9Tu3/zEPbGPbaN24eBC2Nvz14fbHthLDQdTXVqmBob98S98Mvrw3SSwno3ERjQhlCS2J448ee/eT/VLrhhdj5Ms8e/dsOUrH088sKfmbLIuG+Se8KYv3dX92CGpI+Du16yQ4eKGaPvjn2l77PfFrvh6igY2ks18RQUa39J25+N39x7qPf3DobETF7nCXHm4HsjTG+34bH/bA7u9N8Sot1kIPKFE7gx2P3owfGDTzH+ezLw4zDIlNzHjsrFGaAvFPn+v/9DOzHdeLRw9zlK5dcZM0UmM/DH/jiM7e2/bkhqZm3hnfP7c5exkhlW/FOEUR1Od8BbPRwOtBOxB4zcYaj0u0rihcI0CW+JNjvN4e0KR/i5e1q1NBbe1O4XDAoAY9oT3dek5xfo+UpufSEJj4f5OPavCUj63Yv8/svDN+tSG7LJzyJ0B7w3x4Ie7g/u75O4wDcjWQ6f26hGSw3f0+vs7lYlM/hfjhZNJdSzNcmqTTCyr9LmVxg+qQT1gDxpi+bw7Ohq2mcRE0L+/hxeVhggIAij3tRmT6Ug9Ud+HNmNJrb56LQUEytubfY5G7Ix49/dhSbWG9ni2dYO1IiFCyO+7dYfnpk365+8rvnVaGRjRxmd4vgTIDXE0YPZngzmOBowJKwBgsXw0DVWsn4uzCdgD0QQatD0m37wHCwVLwA6Q9hiRpKpsNw8tQeCM66rONc4ZbxKHQlqQk0XVZhXmhiarRFkUg7KTR0AvqKxsn36RSoIY8jhV5CrTc4p9aBYlkjn4vVnh1RvpkpsSKBEpkQUiC8sJ1UdAzlFhXGXI+JVLf4v2LBKpEDH/F0oat0lyhgAAAhUivtqExAsKL2m2Yk8kQQj7nDzTvKjwompfURaEkL+JSxsZR0VDTQedVZmJK+HDyoqZSxIqxCPGIwhYLmO+iOa5pfphQkpj0Uph4h6VdMkll9aaXNeSSy65tOb0/4mdtCMERAXnAAAAAElFTkSuQmCC"></a><nav class="nav"><a href="https://mikhailshevelev-dotcom.github.io/UOiI/#home" target="_blank" rel="noopener noreferrer">Главная</a><a href="#home">Отдел ипотеки</a><a href="https://mikhailshevelev-dotcom.github.io/UOiI/#registration" target="_blank" rel="noopener noreferrer">Отдел оформления</a><div class="sw" role="group" aria-label="Тема оформления"><button type="button" data-t="light" aria-pressed="true">Светлая</button><button type="button" data-t="dark" aria-pressed="false">Тёмная</button></div></nav></div><div class="stripe"></div></header><main id="app"></main><footer>База знаний отдела ипотеки · Материалы для менеджеров · Информация требует проверки актуальности</footer>
 <script>
@@ -63,8 +106,55 @@ document.getElementById('main-search-count').textContent=term?'Найдено р
 document.getElementById('section-grid').innerHTML=items.length?items.map(s=>s.pending?'<div class="card off"><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small><span class="pill">В подготовке</span></div>':'<a class="card" href="'+(s.internal||s.url.startsWith('./')?'#'+s.id:esc(s.url))+'"'+(s.internal||s.url.startsWith('./')?'':' target="_blank" rel="noopener noreferrer"')+'><b>'+esc(s.title)+'</b><small>'+esc(s.desc)+'</small></a>').join(''):'<div class="empty">По вашему запросу ничего не найдено. Попробуйте другое слово.</div>';
 }
 function layout(title,body){app.innerHTML='<a class="back" href="#home">← Назад к разделам</a><p class="crumbs">Отдел ипотеки / '+esc(title)+'</p><h1>'+esc(title)+'</h1><div class="rule"></div>'+body}
-function faq(){layout('Часто задаваемые вопросы','<p class="lead">73 вопроса по 7 темам. Найдите ответ по ключевым словам или выберите тему.</p><div class="notice">Ответы перенесены из рабочей таблицы. Банковские условия и законодательные требования необходимо сверять с актуальными первоисточниками перед применением.</div><div class="tools"><input id="search" type="search" placeholder="Поиск по вопросам и ответам…" aria-label="Поиск"><select id="topic" aria-label="Выберите тему"><option>Все темы</option>'+FAQ.map(s=>'<option>'+esc(s.topic)+'</option>').join('')+'</select></div><p id="matches" class="muted"></p><div id="results"></div>');document.getElementById('search').value=query;document.getElementById('topic').value=filter;document.getElementById('search').oninput=e=>{query=e.target.value;renderFaq()};document.getElementById('topic').onchange=e=>{filter=e.target.value;renderFaq()};renderFaq()}
-function renderFaq(){const n=query.toLocaleLowerCase('ru').trim(),entries=FAQ.flatMap(t=>t.qa.map(item=>({...item,topic:t.topic}))).filter(q=>(filter==='Все темы'||q.topic===filter)&&(!n||(q.q+' '+q.a+' '+q.topic).toLocaleLowerCase('ru').includes(n)));document.getElementById('matches').textContent='Найдено вопросов: '+entries.length;document.getElementById('results').innerHTML=entries.length?entries.map((q,i)=>'<details class="panel qa"><summary><span class="tag">'+esc(q.topic)+'</span>'+esc(q.q)+'</summary><div class="answer">'+linkify(q.a)+'<div><button type="button" data-copy="'+i+'">Скопировать ответ</button></div></div></details>').join(''):'<div class="empty">По вашему запросу ничего не найдено</div>';document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const item=entries[Number(b.dataset.copy)];navigator.clipboard?.writeText(item.q+'\n'+item.a).then(()=>{b.textContent='Скопировано';},()=>{b.textContent='Не удалось скопировать'});});}
+function faq(){
+ const total=FAQ.reduce((n,t)=>n+t.qa.length,0);
+ const active=FAQ.find(t=>t.topic===filter);
+ const base='<a class="back" href="#home">← Назад к разделам</a><p class="crumbs">Отдел ипотеки / Вопросы и ответы</p>';
+ const search='<div class="faq-search"><span class="faq-search-icon" aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Поиск по вопросам и ответам" aria-label="Поиск по вопросам и ответам"><button type="button" id="faq-clear" aria-label="Очистить поиск">×</button></div>';
+ const intro='<h1>Часто задаваемые вопросы</h1><p class="lead">73 вопроса по 7 темам. Выберите раздел или найдите ответ с помощью поиска.</p><div class="rule"></div>';
+ const notice='<p class="faq-disclaimer">Условия банков и законодательные требования необходимо сверять с актуальными первоисточниками перед применением.</p>';
+ let topicView='';
+ if(active){
+  topicView='<a class="faq-topic-back" href="#faq" id="faq-topic-back">← Ко всем темам</a><p class="faq-breadcrumb">Вопросы и ответы / '+esc(active.topic)+'</p><h2 class="faq-topic-heading">'+esc(active.topic)+'</h2><div class="faq-band"><span>Вопросы и ответы</span><span>'+active.qa.length+' вопросов</span></div><div class="faq-list" id="results"></div>';
+ }else{
+  topicView='<div class="faq-grid" id="faq-categories">'+FAQ.map((t,i)=>'<button type="button" class="faq-category" data-faq-topic="'+i+'"><span class="faq-category-title">'+esc(t.topic)+'</span><span class="faq-category-meta">'+t.qa.length+' '+faqPlural(t.qa.length)+'</span><span class="faq-category-arrow" aria-hidden="true">›</span></button>').join('')+'</div><div class="faq-search-results" id="results" hidden></div>';
+ }
+ app.innerHTML='<section class="faq-page">'+base+intro+search+'<p id="matches" class="faq-count" aria-live="polite"></p>'+topicView+notice+'</section>';
+ const input=document.getElementById('search');input.value=query;
+ input.oninput=e=>{query=e.target.value;renderFaq()};
+ document.getElementById('faq-clear').onclick=()=>{query='';input.value='';renderFaq();input.focus()};
+ const back=document.getElementById('faq-topic-back');
+ if(back)back.onclick=e=>{e.preventDefault();filter='Все темы';query='';faq()};
+ document.querySelectorAll('[data-faq-topic]').forEach(button=>{
+  button.onclick=()=>{filter=FAQ[Number(button.dataset.faqTopic)].topic;query='';faq();window.scrollTo({top:0,behavior:'smooth'})};
+ });
+ renderFaq();
+}
+function faqPlural(n){return n%10===1&&n%100!==11?'вопрос':n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'вопроса':'вопросов'}
+function faqQuestion(q,i){
+ return '<details class="faq-question"><summary><span class="faq-qtext">'+esc(q.q)+'</span></summary><div class="faq-answer"><div class="faq-answer-text">'+linkify(q.a)+'</div><button type="button" class="faq-copy" data-faq-copy="'+i+'">Скопировать ответ</button></div></details>';
+}
+function renderFaq(){
+ const n=query.toLocaleLowerCase('ru').trim(),active=FAQ.find(t=>t.topic===filter);
+ const entries=FAQ.flatMap(t=>t.qa.map(item=>({...item,topic:t.topic}))).filter(q=>(!active||q.topic===active.topic)&&(!n||(q.q+' '+q.a+' '+q.topic).toLocaleLowerCase('ru').includes(n)));
+ const results=document.getElementById('results'),count=document.getElementById('matches'),categories=document.getElementById('faq-categories');
+ if(!results||!count)return;
+ const searching=!!n;
+ if(categories)categories.hidden=searching;
+ results.hidden=!active&&!searching;
+ count.textContent=searching?'Найдено вопросов: '+entries.length:active?'В разделе: '+active.qa.length+' '+faqPlural(active.qa.length):'Выберите одну из '+FAQ.length+' тем';
+ const show=entries.length?entries.map((q,i)=>searching&&!active?'<section class="faq-search-group"><span class="faq-result-topic">'+esc(q.topic)+'</span>'+faqQuestion(q,i)+'</section>':faqQuestion(q,i)).join(''):'<p class="empty">Ничего не найдено. Попробуйте другой запрос.</p>';
+ results.innerHTML=show;
+ results.querySelectorAll('[data-faq-copy]').forEach(button=>{
+  button.onclick=()=>{
+   const q=entries[Number(button.dataset.faqCopy)];
+   const copyText=q.q+'\n'+q.a;
+   if(!navigator.clipboard){button.textContent='Копирование недоступно';return}
+   navigator.clipboard.writeText(copyText).then(()=>{button.textContent='Скопировано'},()=>{button.textContent='Не удалось скопировать'});
+  };
+ });
+ document.getElementById('faq-clear').hidden=!searching;
+}
 function navigatorPage(){layout('Ипотечный навигатор','<p class="lead">От менеджера продаж к ипотечному брокеру — пошаговый маршрут.</p>'+STEPS.map((x,i)=>'<section class="panel"><h2>'+esc(x[0])+'</h2><p>'+esc(x[1])+'</p></section>').join(''))}
 function calculators(){layout('Калькуляторы','<p class="lead">Инструменты для предварительного расчёта ипотеки.</p><div class="grid">'+CALCS.map(x=>'<a class="card" href="'+esc(x[1])+'" target="_blank" rel="noopener noreferrer"><b>'+esc(x[0])+'</b><small>Открыть калькулятор ↗</small></a>').join('')+'<div class="card off"><b>Комбо-ипотека</b><small>В исходной таблице указана папка Google без ссылки</small><span class="pill">В подготовке</span></div></div>')}
 function insurance(){layout('Страхование','<div class="grid"><section class="panel"><h2>Страховые партнёры</h2>'+INSURERS.map(x=>'<p>• '+esc(x)+'</p>').join('')+'</section><section class="panel"><h2>Страховые продукты</h2>'+RISKS.map(x=>'<p>• '+esc(x)+'</p>').join('')+'</section></div><div class="notice">Для оформления или продления полиса обратитесь к ипотечному брокеру. Контакт: broker@strana.com. Списки партнёров и продуктов не являются попарным соответствием.</div>')}
