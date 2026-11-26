@@ -130,6 +130,25 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .subsidy-table th .bank-logo { display: block; margin: 0 auto 4px }
 .subsidy-table td .memo-cell-note { font-size: 13px }
 .subsidy-cards { display: none }
+.loyalty-program, .loyalty-info { margin: 0 0 12px; padding: 14px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
+.loyalty-program h3, .loyalty-program > summary, .loyalty-info > summary { margin: 0; font-size: 16px; font-weight: 700 }
+.loyalty-program > summary, .loyalty-info > summary { cursor: pointer }
+.loyalty-program > summary small { margin-inline-start: 6px; color: var(--mu); font-weight: 400 }
+.loyalty-info > div, .loyalty-program .loyalty-context { margin: 10px 0 0; overflow-wrap: anywhere }
+.loyalty-context { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center }
+.loyalty-context > div { display: flex; align-items: baseline; gap: 6px }
+.loyalty-context dd { margin: 0; font-weight: 600 }
+.loyalty-table { margin-top: 12px; max-height: none }
+.loyalty-table table { width: 100%; table-layout: fixed }
+.loyalty-table :is(th, td) { min-width: 0; max-width: none; padding: 8px; overflow-wrap: anywhere }
+.loyalty-table :is(th, td):first-child { width: 12% }
+.loyalty-rows { display: none }
+@media (max-width: 759px) {
+  .loyalty-table { display: none }
+  .loyalty-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 8px; margin-top: 12px }
+  .loyalty-rows .card { margin: 0; min-width: 0; padding: 10px }
+  .loyalty-rows .card > .memo-cell-note { margin-bottom: 8px }
+}
 @media (max-width: 919px) {
   .subsidy-table { display: none }
   .subsidy-cards { display: grid; gap: 10px }
@@ -191,7 +210,7 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
   <div id="app"></div>
 </main>
 <script src="./bank-logos.js"></script>
-<script src="./memo-data.js?v=20261126-7"></script>
+<script src="./memo-data.js?v=20261126-8"></script>
 <script>
 const $ = selector => document.querySelector(selector);
 const app = $('#app');
@@ -213,7 +232,7 @@ function initMemo({ secs, groups, banks }) {
     s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
     s5: 1123676935, s6: 1297562849, s7: 860172231, s8: 558231179, s9: 2109045961,
     s10: 1163106320, s11: 808915854, s12: 31258751, s13: 832103270, s14: 2110526252,
-    s15: 623330971, s16: 277931211, s17: 1899907639, s18: 153621334, s19: 350246124,
+    s15: 623330971, s16: 277931211, s17: 1899907639, s18: 153621334,
     s20: 1016212115
   };
   const source = $('#source');
@@ -255,6 +274,16 @@ function initMemo({ secs, groups, banks }) {
     if (inSearch && filterUnavailable) return result;
 
     const sectionText = [section.t, section.d, ...(section.notes ?? []).flat()].join(' ');
+    if (section.kind === 'loyalty') {
+      result.info = section.info.filter(item => matches([sectionText, item.title, item.text].join(' ')));
+      result.programs = section.programs.map(program => {
+        const context = [sectionText, program.name, program.bank, program.downPayment, program.term, ...program.head.flat()].join(' ');
+        return { ...program, rows: program.rows.filter(row => matches([context, ...row].join(' '))) };
+      }).filter(program => program.rows.length);
+      result.count = result.programs.reduce((count, program) => count + program.rows.length, 0)
+        + (terms.length ? result.info.length : 0);
+      return result;
+    }
     if (section.kind === 'cards') {
       result.items = section.items.flatMap(item => {
         if (item.t === 'note') {
@@ -357,6 +386,38 @@ function initMemo({ secs, groups, banks }) {
     return section.head[index].replace(/^КВ · /, '');
   }
 
+  function loyaltyProgram(program) {
+    const title = richText(program.name);
+    const bank = bankLabel(program.bank, 'sber');
+    const head = program.head.map(([label, note]) =>
+      `<th scope="col">${richText(label)}${cellNote(note, label)}</th>`).join('');
+    const rows = program.rows.map(row =>
+      `<tr>${row.map(text => `<td>${richText(text)}</td>`).join('')}</tr>`).join('');
+    const compact = program.rows.map(([primary, ...rest]) =>
+      `<article class="card"><h3>${richText(program.head[0][0])} ${richText(primary)}</h3>
+        ${fields(rest.map((value, index) => [program.head[index + 1][0], value]))}</article>`).join('');
+    const notes = program.head.map(([label, note]) => cellNote(note, label)).join('');
+    const body = `<dl class="loyalty-context"><div><dt>Банк</dt><dd>${bank}</dd></div>
+      <div><dt>ПВ</dt><dd>${richText(program.downPayment)}</dd></div>
+      <div><dt>Срок программы</dt><dd>${richText(program.term)}</dd></div></dl>
+      <div class="tw loyalty-table" tabindex="0" role="region" aria-label="${esc(program.name)}">
+        <table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="loyalty-rows">${notes ? `<div class="note">${notes}</div>` : ''}${compact}</div>`;
+    if (program.hidden) {
+      return `<details class="loyalty-program"${terms.length ? ' open' : ''}>
+        <summary>${title}<small>Скрытые строки источника</small></summary>${body}</details>`;
+    }
+    return `<section class="loyalty-program"><h3>${title}</h3>${body}</section>`;
+  }
+
+  function loyalty(result) {
+    const info = result.info.map(item => item.immediate
+      ? `<p class="note"><strong>${richText(item.title)}</strong> ${richText(item.text)}</p>`
+      : `<details class="loyalty-info"${terms.length ? ' open' : ''}><summary>${richText(item.title)}</summary>
+          <div>${richText(item.text)}</div></details>`).join('');
+    return info + result.programs.map(loyaltyProgram).join('');
+  }
+
   function subsidyCards(section, result) {
     const bankColumns = result.columns.filter(index => index >= section.lab);
     const rows = result.rows.map(row => {
@@ -447,9 +508,10 @@ function initMemo({ secs, groups, banks }) {
     function option(item) {
       return `<option value="${esc(item.id)}"${item.id === section.id ? ' selected' : ''}>${esc(item.t)}</option>`;
     }
-    const contents = section.kind === 'cards'
-      ? (result.items.length ? `<div class="cards">${result.items.map(card).join('')}</div>` : '')
-      : (result.rows.length ? table(section, result) : '');
+    let contents = '';
+    if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
+    else if (section.kind === 'cards' && result.items.length) contents = `<div class="cards">${result.items.map(card).join('')}</div>`;
+    else if (result.rows.length) contents = table(section, result);
     return `<section class="memo-section">
       <nav class="memo-section-nav" aria-label="Разделы памятки">
         <a class="memo-source" href="#">${active ? 'К результатам поиска' : 'Все разделы памятки'}</a>
