@@ -240,6 +240,10 @@ function initMemo({ secs, groups, banks }) {
 
     const width = section.head.length || Math.max(0, ...section.rows.map(row => row.c.length));
     result.columns = Array.from({ length: width }, (_, index) => index);
+    if (section.id === 's10' || section.id === 's11') {
+      result.columns = result.columns.filter(index =>
+        index < section.lab || section.head[index].startsWith('КВ ·'));
+    }
     if (byBank && hasBankColumns) {
       result.columns = result.columns.filter(index =>
         index < section.lab || section.bc[index]?.some(bank => selected.has(bank)));
