@@ -114,6 +114,10 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .memo-card-details { margin: 10px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 8px 0 0 }
 .memo-card-details summary { color: var(--bb); min-height: 30px }
 .memo-card-details[open] summary { margin-bottom: 8px }
+.memo-cell-note { margin-top: 5px; text-align: left; white-space: normal; font-size: 14px; font-weight: 400 }
+.memo-cell-note > summary { min-height: 28px; width: fit-content; cursor: pointer; font-weight: 600 }
+.memo-cell-note > div { padding: 6px 9px; border: 1px solid currentColor; border-radius: 8px; overflow-wrap: anywhere }
+.memo-cell-note a { color: inherit; text-decoration: underline }
 .memo-table-hint { color: var(--mu); margin: 0 0 8px; font-size: 14px }
 .tw { overflow: auto; max-height: min(75vh, 640px) }
 .tw td { overflow-wrap: anywhere }
@@ -157,7 +161,7 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
   <p class="memo-status" id="status" role="status"></p>
   <div id="app"></div>
 </main>
-<script src="./memo-data.js?v=20261126-4"></script>
+<script src="./memo-data.js?v=20261126-5"></script>
 <script>
 const $ = selector => document.querySelector(selector);
 const app = $('#app');
@@ -219,11 +223,11 @@ function initMemo({ secs, groups, banks }) {
     if (byBank && hasBankTags && !hasBankColumns && !section.banks.some(bank => selected.has(bank))) return result;
     if (inSearch && filterUnavailable) return result;
 
-    const sectionText = `${section.t} ${section.d}`;
+    const sectionText = [section.t, section.d, ...(section.notes ?? []).flat()].join(' ');
     if (section.kind === 'cards') {
       result.items = section.items.flatMap(item => {
         if (item.t === 'note') {
-          const show = terms.length ? matches(`${sectionText} ${item.x}`) : !inSearch;
+          const show = terms.length ? matches([sectionText, item.x, item.note].join(' ')) : !inSearch;
           return !byBank && show ? [item] : [];
         }
         if (byBank && !item.b.some(bank => selected.has(bank))) return [];
@@ -232,7 +236,7 @@ function initMemo({ secs, groups, banks }) {
         const text = byBank && item.kb
           ? [item.n, item.g, ...entries.flat(), ...item.more.flat(2)].join(' ')
           : `${item.s} ${item.n} ${item.b.map(bank => bankNames.get(bank)).join(' ')}`;
-        return matches(`${sectionText} ${text}`) ? [{ ...item, kv: entries }] : [];
+        return matches([sectionText, text, item.note].join(' ')) ? [{ ...item, kv: entries }] : [];
       });
       result.count = result.items.filter(item => terms.length || item.t !== 'note').length;
       return result;
@@ -250,11 +254,11 @@ function initMemo({ secs, groups, banks }) {
     }
     const bankColumns = byBank && hasBankColumns ? result.columns.filter(index => index >= section.lab) : [];
     if (byBank && hasBankColumns && !bankColumns.length) return result;
-    const headers = result.columns.map(index => section.head[index]).join(' ');
+    const headers = result.columns.flatMap(index => [section.head[index], section.headerNotes?.[index]]).join(' ');
     let blockHeading;
     for (const row of section.rows) {
       if (row.span) {
-        if (matches(`${sectionText} ${row.c[0]}`)) {
+        if (matches([sectionText, row.c[0], row.notes?.[0]].join(' '))) {
           result.rows.push(row);
           if (terms.length) result.count++;
         }
@@ -265,9 +269,11 @@ function initMemo({ secs, groups, banks }) {
         blockHeading = row;
         continue;
       }
-      if (bankColumns.length && bankColumns.every(index => isEmpty(row.c[index]))) continue;
-      const cells = result.columns.map(index => row.c[index]).join(' ');
-      const heading = blockHeading?.c.join(' ') ?? '';
+      if (bankColumns.length && bankColumns.every(index => isEmpty(row.c[index]) && !row.notes?.[index])) continue;
+      const cells = result.columns.flatMap(index => [row.c[index], row.notes?.[index]]).join(' ');
+      const heading = blockHeading
+        ? result.columns.flatMap(index => [blockHeading.c[index], blockHeading.notes?.[index]]).join(' ')
+        : '';
       if (!matches(`${sectionText} ${headers} ${heading} ${cells}`)) continue;
       if (blockHeading && !result.rows.includes(blockHeading)) result.rows.push(blockHeading);
       result.rows.push(row);
@@ -284,17 +290,26 @@ function initMemo({ secs, groups, banks }) {
     return richText(text);
   }
 
+  function cellNote(text, label = '') {
+    if (!text) return '';
+    const open = terms.length && matches(text) ? ' open' : '';
+    const accessibleLabel = label ? ` aria-label="Примечание · ${esc(label)}"` : '';
+    return `<details class="memo-cell-note"${open}><summary${accessibleLabel}>Примечание</summary><div>${richText(text)}</div></details>`;
+  }
+
   function fields(entries) {
-    return `<dl>${entries.map(([label, text]) => `<div><dt>${richText(label)}</dt><dd>${value(text)}</dd></div>`).join('')}</dl>`;
+    return `<dl>${entries.map(([label, text, note]) =>
+      `<div><dt>${richText(label)}</dt><dd>${value(text)}${cellNote(note, label)}</dd></div>`).join('')}</dl>`;
   }
 
   function card(item) {
-    if (item.t === 'note') return `<div class="note${item.h ? ' h' : ''}">${richText(item.x)}</div>`;
+    if (item.t === 'note') return `<div class="note${item.h ? ' h' : ''}">${richText(item.x)}${cellNote(item.note)}</div>`;
     const limit = !terms.length && item.kv.length > 7 ? 4 : item.kv.length;
     const extras = item.kv.slice(limit);
     const extraFields = extras.length ? fields(extras) : '';
     const more = item.more.map(entries => `<div class="memo-more">${fields(entries)}</div>`).join('');
     return `<article class="card"><h3>${richText(item.n)}${item.g ? `<small>${esc(item.g)}</small>` : ''}</h3>
+      ${cellNote(item.note, item.n)}
       ${fields(item.kv.slice(0, limit))}
       ${extraFields ? `<details class="memo-card-details"><summary>Все условия</summary>${extraFields}${more}</details>` : more}
       </article>`;
@@ -303,15 +318,16 @@ function initMemo({ secs, groups, banks }) {
   function table(section, result) {
     const columns = result.columns;
     const head = section.head.length
-      ? `<thead><tr>${columns.map(index => `<th scope="col">${richText(section.head[index])}</th>`).join('')}</tr></thead>`
+      ? `<thead><tr>${columns.map(index => `<th scope="col">${richText(section.head[index])}${cellNote(section.headerNotes?.[index], section.head[index])}</th>`).join('')}</tr></thead>`
       : '';
     const rows = result.rows.map(row => {
       if (row.span) {
-        return `<tr><td class="span" colspan="${columns.length}">${richText(row.c[0])}</td></tr>`;
+        return `<tr><td class="span" colspan="${columns.length}">${richText(row.c[0])}${cellNote(row.notes?.[0])}</td></tr>`;
       }
-      const cells = columns.map(index => row.c[index]);
-      return `<tr${row.sub ? ' class="sub"' : ''}>${cells.map(cell =>
-        `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${richText(cell)}</td>`).join('')}</tr>`;
+      return `<tr${row.sub ? ' class="sub"' : ''}>${columns.map(index => {
+        const cell = row.c[index];
+        return `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${richText(cell)}${cellNote(row.notes?.[index], section.head[index])}</td>`;
+      }).join('')}</tr>`;
     }).join('');
     return `<p class="memo-table-hint">Прокрутите таблицу, чтобы увидеть остальные столбцы.</p>
       <div class="tw" tabindex="0" role="region" aria-label="${esc(section.t)}"><table>${head}<tbody>${rows}</tbody></table></div>`;
@@ -366,6 +382,7 @@ function initMemo({ secs, groups, banks }) {
         </label>
       </nav>
       <h2 class="sh" tabindex="-1">${esc(section.t)}</h2><p class="sub">${esc(section.d)}</p>
+      ${(section.notes ?? []).map(([label, text]) => `<div class="note">${richText(label)}${cellNote(text, label)}</div>`).join('')}
       ${contents || '<p class="empty">Попробуйте изменить поиск или фильтр по банкам.</p>'}
       </section>`;
   }
