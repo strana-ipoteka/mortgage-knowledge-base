@@ -8,15 +8,15 @@
 :root{--bg:#f3f4f8;--sf:#fff;--tx:#29303e;--mu:#6b7285;--bb:#951b81;--bl:#f5e9f3;--bm:#e0c6db;--fu:#c7017f;--fl:#fde6f2;--ln:#e3e5ed;--thb:#951b81;--gr:linear-gradient(120deg,#831f82,#c7017f 60%,#e30613);--sh:0 2px 10px rgba(41,48,62,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c212b;--sf:#272d3a;--tx:#eceef4;--mu:#a3a9bb;--bb:#e08fd2;--bl:#3a2c3b;--bm:#5a4358;--fu:#f06bb4;--fl:#47263c;--ln:#363d4d;--thb:#7a1a6c;--sh:none;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#1c212b;--sf:#272d3a;--tx:#eceef4;--mu:#a3a9bb;--bb:#e08fd2;--bl:#3a2c3b;--bm:#5a4358;--fu:#f06bb4;--fl:#47263c;--ln:#363d4d;--thb:#7a1a6c;--sh:none;color-scheme:dark}
-*{box-sizing:border-box}html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px)}
+*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Montserrat,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 a{color:var(--fu)}mark{background:var(--fl);color:var(--fu);border-radius:3px;padding:0 2px;font-weight:600}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--ln)}
+
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
 .bar{display:flex;gap:8px;align-items:center;max-width:1200px;margin:auto;padding:10px 14px}
 .logo{font-weight:700;color:var(--tx);text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:10px;font-size:14px}.brand{max-width:1200px;margin:auto;padding:16px 14px 6px}.brand img{height:30px;width:auto;display:block}.logo i{color:var(--fu);font-style:normal}
 .sr{flex:1;position:relative}.sr input{width:100%;padding:10px 36px 10px 14px;border:1.5px solid var(--bm);border-radius:14px;background:var(--sf);color:var(--tx);font-family:inherit;font-size:inherit;outline:0}
-.sr input:focus{border-color:var(--fu)}.sr label{display:block;font-size:12px;font-weight:700;color:var(--bb);margin:0 0 3px 6px;text-transform:uppercase;letter-spacing:.04em}.bar2{max-width:1200px;margin:auto;padding:0 14px 10px}.sr button{position:absolute;right:6px;bottom:6px;border:0;background:var(--bl);color:var(--bb);width:26px;height:26px;border-radius:50%;cursor:pointer;display:none}
+.sr input:focus{border-color:var(--fu)}.sr button{position:absolute;right:6px;bottom:6px;border:0;background:var(--bl);color:var(--bb);width:26px;height:26px;border-radius:50%;cursor:pointer;display:none}
 .btn{border:1.5px solid var(--bm);background:var(--sf);color:var(--bb);border-radius:14px;padding:9px 12px;font-family:inherit;font-size:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn b{background:var(--fu);color:#fff;border-radius:10px;padding:0 7px;margin-left:4px;font-size:12px}.btn.on{background:var(--bl)}
 .panel{max-width:1200px;margin:auto;padding:0 14px 12px}.chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -31,8 +31,6 @@ main{max-width:1200px;margin:auto;padding:16px 14px 60px}
 .tile{display:block;text-decoration:none;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--bb);border-radius:14px;padding:12px 14px;box-shadow:var(--sh)}
 .g1 .tile,.g3 .tile{border-left-color:var(--fu)}.tile:hover{border-color:var(--fu)}.tile b{display:block}.tile small{color:var(--mu);display:block}.tile em{font-style:normal;color:var(--fu);font-size:12px;font-weight:600}
 .back{display:inline-block;margin-bottom:10px;color:var(--bb);font-weight:600;text-decoration:none}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:thin}.tabs a{white-space:nowrap;padding:5px 12px;border-radius:18px;background:var(--sf);border:1px solid var(--ln);color:var(--tx);text-decoration:none;font-size:13px}
-.tabs a.on{background:var(--fu);color:#fff;border-color:var(--fu)}
 h2.sh{margin:6px 0 2px;color:var(--bb);font-size:21px}.sub{color:var(--mu);margin:0 0 10px}
 .info{background:var(--bl);border-radius:12px;padding:8px 12px;margin:0 0 12px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px;align-items:start}
@@ -47,22 +45,12 @@ table{border-collapse:separate;border-spacing:0;font-size:14px;line-height:1.45;
 th,td{border-bottom:1px solid var(--ln);border-right:1px solid var(--ln);padding:10px 12px;vertical-align:top;min-width:96px;max-width:320px}th{font-size:12.5px;line-height:1.3}
 th{position:sticky;top:0;background:var(--thb);color:#fff;z-index:2;text-align:left}td:first-child,th:first-child{position:sticky;left:0;background:var(--sf);z-index:1;font-weight:600;min-width:120px;max-width:200px;box-shadow:2px 0 4px rgba(41,48,62,.06)}tbody tr:nth-child(even) td:first-child{background:var(--bg)}th:first-child{background:var(--thb);color:#fff;z-index:3}
 tr.sub td{background:var(--fl);color:var(--fu);font-weight:700}td.x{color:var(--bm);text-align:center}td.span{max-width:none;white-space:normal;background:var(--bg)}
-.res{margin-bottom:26px}.res>h2{font-size:17px;margin:0 0 8px;color:var(--bb);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.res>h2 a{font-size:13px}
 .empty{text-align:center;color:var(--mu);padding:40px 10px}
-.ctc{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.ctc div{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:8px 12px}.ctc small{color:var(--mu);display:block}
-details{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:10px 14px;margin-top:24px}summary{cursor:pointer;font-weight:600;color:var(--fu)}details li{margin:6px 0}
-.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:6px 0 8px}
-.bg{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;min-height:140px;padding:20px 18px;border-radius:14px;border:0;background:var(--thb);color:#fff;font-family:inherit;font-size:inherit;cursor:pointer;box-shadow:var(--sh);transition:.2s}
-.bg:hover{background:var(--gr);transform:translateY(-2px)}.bg b{font-size:18px;line-height:1.2}.bg small{color:rgba(255,255,255,.85);font-size:12.5px;max-width:190px}.bg em{font-style:normal;background:rgba(255,255,255,.2);color:#fff;border-radius:12px;padding:1px 12px;font-size:13px;font-weight:700}
-button.lk{margin:30px 0 0;padding:6px 0;border:0;background:none;font-family:inherit;font-size:20px;font-weight:700;color:var(--bb);cursor:pointer;text-decoration:underline;text-decoration-color:var(--fu);text-underline-offset:6px}button.lk span{color:var(--fu)}
-#md{position:fixed;inset:0;z-index:30;background:rgba(46,39,71,.45);display:none;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px)}#md.on{display:flex}
-#md .box{background:var(--bg);border-radius:28px;max-width:820px;width:100%;max-height:100%;overflow:auto;padding:22px;box-shadow:0 10px 40px rgba(46,39,71,.3);position:relative}
-#md h2{margin:0 36px 2px 0;color:var(--bb);font-size:22px}#md .sub{margin:0 0 14px}#md .x{position:absolute;right:14px;top:14px;border:0;background:var(--bl);color:var(--bb);width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer}
 footer{color:var(--mu);font-size:12px;margin-top:22px}
 @media (max-width:600px){.hero h1{font-size:20px}.logo span{display:none}}
 
 .memo-return{position:sticky;top:0;z-index:12;padding:9px max(14px,calc((100vw - 1200px)/2 + 14px));background:var(--bg);border-bottom:1px solid var(--ln)}.memo-return a{display:inline-block;background:var(--sf);color:var(--bb);border:1px solid var(--bm);border-radius:12px;padding:8px 14px;text-decoration:none;font-weight:700;font-size:14px}.memo-return a:hover{border-color:var(--fu);color:var(--fu)}
-.bar2{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+
 #theme{margin-left:auto;min-width:86px}
 
 /* Общий стиль страниц базы знаний, без изменений логики и сетки банков */
@@ -79,7 +67,7 @@ body{font-family:Inter,Montserrat,"Segoe UI",Arial,sans-serif}
 .brand{max-width:1160px}
 .brand img{height:24px}
 .top{background:var(--bg);border-color:var(--ln)}
-.bar,.bar2,.panel,main{max-width:1160px}
+.bar,.panel,main{max-width:1160px}
 .btn{border-radius:12px}
 .sr input{background:var(--sf);border-color:var(--ln);color:var(--tx);border-radius:12px}
 .hero{border-radius:24px}
@@ -88,105 +76,383 @@ body{font-family:Inter,Montserrat,"Segoe UI",Arial,sans-serif}
 .chip{border-radius:14px}
 @media(max-width:670px){.memo-return{padding:14px;min-height:62px}.memo-wordmark{font-size:10px}.memo-headtools{gap:7px}.memo-theme{padding:9px;font-size:12px}}
 </style>
-<link rel="stylesheet" href="./site-consistency.css?v=1"><link rel="stylesheet" href="./uoii-reference-style.css?v=3"></head><body>
+<link rel="stylesheet" href="./site-consistency.css?v=1"><link rel="stylesheet" href="./uoii-reference-style.css?v=3">
+<style>
+.memo-pagehead { position: relative }
+body:has(.memo-return) .memo-pagehead { margin-bottom: 22px }
+body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
+.memo-source { font-size: 14px; font-weight: 600; text-underline-offset: 3px }
+.memo-tools { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 16px; margin-bottom: 22px }
+.memo-toolbar { display: flex; align-items: end; gap: 10px }
+.memo-toolbar .sr { min-width: 0 }
+.memo-toolbar .sr label { display: block; margin: 0 0 4px; font-size: 14px; font-weight: 600 }
+.memo-toolbar input, .memo-toolbar .btn { min-height: 44px }
+.memo-toolbar input::-webkit-search-cancel-button { display: none }
+.memo-toolbar .sr button { width: 32px; height: 32px }
+.memo-bank-panel { max-height: 230px; overflow-y: auto; margin-top: 12px }
+.memo-bank-panel .chip { min-height: 36px; font-size: 14px }
+.chip.on { background: var(--fl); color: var(--bb); border-color: var(--bb) }
+.memo-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px }
+.memo-filters[hidden] { display: none }
+.memo-filters button { min-height: 32px }
+.memo-filters .lnk { padding: 4px 6px; font-size: 14px }
+.memo-status { color: var(--mu); margin: 0 0 12px; font-size: 14px }
+.memo-status:empty { display: none }
+.memo-catalog section + section { margin-top: 25px }
+.memo-catalog h2, .memo-results h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.3 }
+.memo-catalog section > p { margin: 0 0 10px; color: var(--mu); font-size: 14px }
+.memo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: 10px }
+.memo-entry { display: grid; gap: 4px; padding: 12px 15px; border: 1px solid var(--line); border-left: 4px solid var(--purple); border-radius: 12px; background: var(--surface); color: var(--tx); text-decoration: none; overflow-wrap: anywhere }
+.memo-entry:hover { border-color: var(--accent) }
+.memo-entry small { color: var(--mu); font-size: 14px }
+.memo-section-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 18px }
+.memo-section-nav label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px }
+.memo-section-nav select { max-width: 100%; min-height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--tx); font: inherit }
+.memo-section .sub { margin-bottom: 16px }
+.memo-more { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px }
+.memo-section dt { font-size: 13px }
+.memo-card-details { margin: 10px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 8px 0 0 }
+.memo-card-details summary { color: var(--bb); min-height: 30px }
+.memo-card-details[open] summary { margin-bottom: 8px }
+.memo-table-hint { color: var(--mu); margin: 0 0 8px; font-size: 14px }
+.tw { overflow: auto; max-height: min(75vh, 640px) }
+.tw td { overflow-wrap: anywhere }
+.memo-tools :focus-visible, .memo-results :focus-visible, .memo-catalog :focus-visible, .memo-section :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+@media (max-width: 580px) {
+  .memo-tools { padding: 12px }
+  .memo-toolbar { gap: 6px }
+  .memo-toolbar .btn { padding-inline: 9px }
+  .memo-grid { grid-template-columns: 1fr }
+  .memo-section-nav { align-items: flex-start }
+  .memo-section-nav label { width: 100% }
+  .memo-section-nav select { width: 100% }
+}
+</style>
+</head><body>
 <div class="memo-return"><a href="./#home" data-site-back aria-label="Вернуться назад">← Назад</a><div class="memo-headtools"><span class="memo-wordmark">Отдел ипотеки</span><div class="sw" role="group" aria-label="Тема оформления"><button type="button" data-t="light" aria-pressed="true">Светлая</button><button type="button" data-t="dark" aria-pressed="false">Тёмная</button></div></div></div><div class="stripe" aria-hidden="true"></div>
 <div class="brand"><a href="#"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXgAAAAgCAYAAAAYN2OIAAARm0lEQVR42u1deXRc1X3+7ltnRiPNaLRYi60F4X0lCQQDsVkcYicEDiUQCsdd6MkhpBygwbTQBNq00LQscSAU4kJJKZQYSIECSVgMxIQ6Zokt2ch2hGXJkqyxrGU0o9nevPfu7R+SrJnRe2/eaLE97vvO0RnNzL333ff73fvd5X33N4QxBgcOHDhwcPqBc0zgwIEDBw7BO3DgwIGDAoJgNyHVqRwfjK/q29t727H9fdfG+6MAnfiejL+yzPfZIJj8PUnLZ1aeUR6j9BjbciIW17a6hlm67DS+ZVV9dd9YvoJ3i8fCn/bd0v2LPQ/rCTUzX3qerPswtU/WdcouatxWuW7+NZwshGJtA3/a88zu/9Djqmn+fHxgCKO8NnfxiJ3y7ZZjck2+WIKrsTTpPbv2+66msq28RwiCEDqtC1Im6hGlKdZy9I5Yc/AGpWsY0E701iXLeCWmhkhLxyaXQWDmOHa8cRCT78jYqzCnGBU3rlnBl3pax20b/mXL27HtbetYSk/LM5ZvrJ5SUwUCf752LlckH7G60+h7n/5n9K2WjUxRTesiLayBf+NFNZxHDubyHY0lapW9nX+V3H3wFrW7D6N1ZMb3D3b8PtPvI7PfMQP70bG36bYytyFL+x8mrxPf08m+N8hDxvmNsCz/p/nC50XxHbc2csXFnbYInupUHjw4cN2eF5qfOvTuQSRDcegpHUynGURCssiQmHT67O8z8luUl3OAyCJ4zoD0iMkgQXKQ76T6MqB6/cI5cy9f4uPd4rFYV+hr3S/ugRZWzInW7BrMerARfK515WubijkZISU4sib44h6ooWTWoGaf4HOSfw6CJ3YIntkbCHINUIZ5OIAInItziQ8Wrap6sOKPV3T418+/TPS7DkyF6JWu8NcGnt/7+tBL+5DqCoMmNTCd5j2ozRjBpxMwMejg4x2ZsUmdOztNRsdPL59hgiQMCEdeUInA9efW8aWe1vHaJX7ftS70Xx+CxZW0eqXXmcGzugml150XQA6CV1q7Nw5v/QA0mkwjysy6eC9cCt81F5TCjOAZ47Tg0NrIi++/O/LyB1APHwNLpsB0LY2ImQEhszHbsSyCz7YZyxoMzAjeuBxGJq4zOS0dK4MaEHx2epbl8zGCZ+n3Ro//z1WVw3vzjXNgh+CVEaWh+ee7Ova80IKRI8PQEtrEDJmxTBI2IVJi0PlJjhm8UXkw+cyM4NksEzxNaWCM8QDAdCrrCQ1mM/jpEDxT9Yn/KRPHr0MsCPG0Jvgx6GEF4Xc7EP34SKPvtQOtczddcI9nRdVDRODitibtKd0Xeu3Ab478aMeqZNsA9GgKRM9/1n76ETwDTaoAY1x2O2SJFGgiNYngCWFgYGCKBsZyb/uOl8USqUkkNv5KFQ1g4A0L0HU58uqHvw3962tnK/sPg0XjgE4NCdfwvQHBw4TgYUjwzLz8NIKfuI4xwcOE4E3/2Fhakl3fCYJnyWSG70wJPhlOzn/nvm1tn711AEo4CVA2ww3agYNpUqKqQxtKYOj1PyDZHvqH+vvWLfetafgWkfiwJbkntfLgIzv7+/7tY6R6R8A06hizQEAVtXT4iTeGQo+9Bq13EEzTsrZcHKTDcLRNxVK17/3LO20HfrUPiVACjDoGdHAKE72iI7b3KNpvef3qaHPwTqZRj2laTfccffyj/qOPfQilJ+KQeyH5Wdfl4X9/c2joJ/8DtWcATNMdo+RL8Iwy8ffPftJz4I39UKKKYyEHhQGdQekYxuG73rpT6QlfyigTjZKF3z70i+BjHyF1NHp8VeqgMBB/v/WJ0E9/BS045PhuqgR/tDX4ly3PNyM5nISz8nFQWOt3huiHPeh/tuVlmlArJ40BI0pD9z9t35A6EnEIotDG73Bs/uBDL23Uugcc3+WBjD14XdW9u3++e3O4N+xsyzgozGW8StH/XAsCVyy+2rOk4nHCc8eXof3P7elIHBgAnG2Z2bG9roPGk9W6LIQs06XUvCePI699tF1p6QBTNcfQUyX4SDCy9tAHh6ApmvMw1UHBQukYxvC2g5tdTYHneQ8XBAA9rlYP/vc+0FjKMdAsIbm/Fz1/8eSviTC+MWCsFVe7B0CT9v3AdF2ObN1erY8kHCNPh+AP7zz8YCKUsDW68hIPt98NjudASKbsL1+Z5PjnSEubSyaZkRfT08HDSnZpUA8AkAIeEI6oAMC5hAFXdTH0ImlSvdSwAj2mWNqUkwXIATcIIZMklUKJDEJg+2kS4QikCi84nkxJJolTWCapR1PQIja2DilD5N0OVF6/qo53i30goIl9/TclDw6OatxzXV8gEAIeEInPnXbm5r9ZZU5FJomcMkk9ngQdTmI29l9pJIn4zvbjDiSGWnSAUQow+6uo1GfBjUrbEcDGQ1Ui8OD8XhBZgLEOHjZ18OM2N5ZJGh9iSpMvpskkyaRys3XwWXUxk2LGYqDDw3n5LoPge1uOLNJTes4W3XBBI1Zd9/m3Smp927gcuuOpnm5MI19+JjoVYfbDMtgpXyyWO4UiqQcAys+pu+ucJ77xDtOpnJ3u0E93bj7ycitownxpWbykEkv+8cuPiz5XGxj49OuLFUUfc27xmG2H+t1YtuXKrVK5Z9d0Ois5QXnygRZRmoa3td947MlPoA7GLdt5fH8/tFBiiVDu2UUIofE9wdv1ESVn33AvqUTNbeeGXYsrtnCyGEIeg+tMYfLpTpPR1jS/eZqhl5rvH/jJ+6DxWRBQMDambGFZWvlRkmPpRJZHY0m2HLqDxnLXV1owF6U3fV2XVzQ+RFzSALExmFq3XZbnQMjy8pP5KWXj94lX37x/ZPMWsHh0agQf6gyB5pjhVC6txto7L7m17MyK5ziRGznZnf6kgRA6PoMXS+R2wVveZdjoyoo2E2JtBaFIgndRxZNSqbvV6jq2qiVyKFpY/jO52rv9tLM5hehdWfUAGDsYfHQnaMzcLKngCPRYau7ooQ+CxMGQh6nWbZv3yWh4aP1W77lzN3GycFLIfbYh7ey4H3xhhaBSO/oW5Jq9k2I3Ku79s7c8X1p+I3HLx0DISfDd7D63VHftuRs8VzzlLRolouR8uHrGhU3wNwReEVzCgLPDlUbCPFGMv7IxxBGAcJya/kBwWtXhSZJwnJq2Bjw9wEPhRTladuWS7/U/23xfKm7xsE6jUI9FvwiducBD0SPJnOqL4tV18Kyc8wDvkYKnne2O7wcSHQBfSFXWBiOj2zoWcC1rgOsLC+7hvO6uaccmOmV5hsv7vjKPI9uIDS97ZXA8l3RY3cFJ43mPGCQ2ZqFMZzJL2z7I2RmKRBCBj5+25F6gsKPoI24ZRBDipy25T3U8z+g4sjAeGs4Unb89hMRwYhHLilXhwMEJ6uzi8PbOp7RwjoethECsKPqE8CQJAJxLzNm2ozu6oAZH1pgdknJwciCUeHKuhFP7u6B2H1tv9Bzs/7Xt0t/45/kR3NsLarF7dWRXNz58/H+3r7z2rO94yoqaSY4Rc6p78DO9dz/2zGfGBiVO5kNiias9n/3xkwld0Uv1cHIBCnhgZhr1RLZ3PnX0kd9BH7GW2YnlHvBFUs/4jE6q94EIOUiiL4au72/bUv3d85e7GvyvgOeUU+8hqy1LgQhCnC917yuU9mnpy/rKMATeZ5VG6wth4O+fuT9w2x8tks6seQ48b+G7fB6y5mf3GUlPCOXLA7vAcdP2XQbBVy+rUtve/oNILZQ0WkLD3hda0Pmb9sfcJa7R8K2YvkwSMyaTNPjMoF5mzjWUSGKyjLPs/Hosvn1NveiVuwqhk0R2936v4973btcjSu4BlE0tlvxsyiSB0UNMSvcwtOHc++nymQHwpe594xJTz/I5z3AecaPlwEAZht88iHjz0ZuFCs/Ndh5GnqoySXlRJeY9ePlSodSzr9AJ3rWs4RFOFu+2HGkpQ3x7C5TWjhuESv8No74zk0lm2vW4NJFl2zNbDpmdZ3I5xlEps31sLZPkSryoeObhVVxZacuMEnz9ufWbpCLpYTXHYRAtoWL4cAgRzpyQT164YOOp+kyHC3bVloDprGCWg3ok2TTy6VHoQwlLYjL8gRWWJ8nbUMFNdYCBzZC+vgvqIRRLHeMz+KLlVT+Wqos3qgNxyzJYSofSE4bSG7FN3jNK8gQThESyO3+aBJIZ6asn0rCxFc8JXXm4RYi1AZAxoa/Zj2LoQyPQQ/bDRUhL6x7l55bdrQ+NALpu4TsNWnAQWl8I048Hn03wNIO8ZzMePB/wgWnajPgug+ADZ5S9WLOq9uFD7x0EVXOsTBkD06ewSmEz8DmzrpdhEjaNlZWRPJUyYCwefGHsb4BjOgPLRZBpKyBmsrpiFkQ3Hmqc5SBElmMGz6ZBokLADf+lTU9yaUovIeDe69+wAInPBi3llcfvV2e2FtwEMyWOy4wHz0xm8CxtBs8MCWksjX7iQ424ltSi5uGN9/B+zwGrdMM/e/eFoS1v29bicy5pwLvhbITaesFiCRu+ozjZ8eAxjXjwTJ+5XcEMghfdYt9Z3zxra+/unmvj/TE4cFCIKL1sIdxL5zya/uMfhCPqnBs+d/nA83tfVTpCTiC92ZjBu0RIdeW/5APevVbp+EAxwOUxZBNQ/3Vrr4y+suPl1IFuJ9hYHsjYySCE0IbV9d9d+JVFENyCYx0HBQdXUwDVN51zj+BzfZYtmZPm+d6ouWU1eJ8jtJgVggcBCNEJR1Srv6mULc6r+HXgO5eF+VKvY+ipEvzoLF7qO++m89fVrJwLTnCUkA4KB7zfhbk/uLjVvbhii9FP9xGOqBXXr1hQftVS8B5HCVlQgwfPKSVXrj7bd91FIEUuxyBTJXgQ0JLqkve//HeX3jjv7DqH5B0UBMRyD+ruXaeXfmX+FZzFKWu+xNVe+7drN5RdsxxcVnA4B6c4WZV42gO3XvEl/8aLQYqcVdjUCH58prOg4un19224dvlVKyE6HcHBKTu1I/Asn4PGzV89UHHNssXpyhmTfQQq1Za8M+8HF62t2XQ+xMoi54eGC8fXVJjj31F+5zc/X7bpagjVgZyH1xyCN/uC55RAY9lLF9558Yr1P/zqjsY1Z4CXecdiDk4ZyPV+zPubNVjw9FU3B76+cK1QIrfbOapOOKJKVd4Pam5Z3Tj/6au2ll2zHILf7RB9gZA8X1bcXPrtDY01T296xPcnl4w+tHV8ZwghV0fwlHpaF65ffFn9eY1NoUODV/d80v3XQ239iBwJQ1e0SfHDzXTwSHufTzx45HvQ6bjudXL5eV87K286ihoDIDZi8rhqi+FbWQ2a1Eyv4Z1fDiKQeE5nlcjtJSuqoY0opvUXyzwgIh81zLuyClokZWif7LLM4sFbthcT/5ilMwUzzyNVFcF1RgDeL9S0e1dV/7NUU/IeVyT1mAV7sySKYqmzZE39tzwrqx5QesKXRn/X/cPY7iBSXcPQR1K2QpbP+EEnkqZvJ0aHZLIPOmV+N57XtbASRs8hhArvJ55VtV8clShO1v8SMEgNZSASH07/Rqz1w/25OrBEKu3G08P/MkgLqgyvOakOVb4O16qGRpZImWr55fk1gFlZhFC+2NPpPmfhXfKieU9q377skviO1s1K8yGo3X2g0cRYvHmWxQfZksiJz4jBZxP2BOzHgzcqI1seOV4n84NOEIRJ986Vl+6Szlp2EYvFTDT5ACkvBRHF6ER/Zsxu++OoTl1aSvNRlXqpTl12jr0T++3b9vJgtgdrO+VzkhAWvFJXLlWAFkvV6km13Or+OJEfEYrlzlxl0ZTu00aUBljFSuGIKhocUbeV9wTYbdrX4DmFCFycSHyYSHx4Ro7iM3CMUpEpeoCmdB/TqYxTPh4Ns/aBwMV5n/uzSe0goVbSmDLXOGzHWJk8p/A+d1t6dFMaU2ppQp1j1eeJyEf5Enc7crXjuFJN46lqy7IkPswXezphw79MpzJT1ABTNS803TPhOzbj9p35PAb5CEf5gG9vdqgClkyWs2i8jjHKmfqd41Su1L9vPK99gnfgwIEDBwUFRyLjwIEDB6cp/g+bLtrMLMiYHAAAAABJRU5ErkJggg==" alt="Страна"></a></div>
-<header class="top"><div class="bar">
-<div class="sr"><label for="q">Поиск</label><input id="q" type="search" placeholder="Ключевое слово, условие…" autocomplete="off"><button id="cl" title="Очистить">✕</button></div></div>
-<div class="bar2"><button class="btn" id="bb">Банки <b id="bn" hidden></b></button></div>
-<div class="panel" id="bp" hidden><div class="chips" id="chips"></div><button class="lnk" id="rs">Сбросить все фильтры</button></div></header>
-<main id="app"></main>
-<div id="md"><div class="box"><button class="x" id="mx" title="Закрыть">✕</button><div id="mb"></div></div></div>
+<main>
+  <div class="memo-pagehead">
+    <h1>Памятка «Банки России 3.0»</h1>
+    <p>Найдите условия по программе, банку или ключевому слову.</p>
+    <a class="memo-source" id="source" href="https://docs.google.com/spreadsheets/d/1BIwMWMBAB7LR9MbR5qGrIXYbq_LdFshCPz1Q_l-Mqcs/edit?gid=1749938485" target="_blank" rel="noopener">Открыть Google Таблицу</a>
+  </div>
+  <div class="memo-tools">
+    <div class="memo-toolbar" role="search" aria-label="Поиск по памятке">
+      <div class="sr">
+        <label for="q">Поиск по памятке</label>
+        <input id="q" type="search" placeholder="Например, маткапитал" autocomplete="off">
+        <button id="cl" type="button" aria-label="Очистить поиск">×</button>
+      </div>
+      <button class="btn" id="bb" type="button" aria-controls="bp" aria-expanded="false">Банки <b id="bn" hidden></b></button>
+    </div>
+    <div class="memo-bank-panel" id="bp" hidden>
+      <div class="chips" id="chips" role="group" aria-label="Фильтр по банкам"></div>
+    </div>
+    <div class="memo-filters" id="filters" aria-label="Активные фильтры" hidden>
+      <div class="chips" id="selected"></div>
+      <button class="lnk" id="rs" type="button">Сбросить всё</button>
+    </div>
+  </div>
+  <p class="memo-status" id="status" role="status"></p>
+  <div id="app"></div>
+</main>
 <script src="./memo-data.js?v=family-s2-20261119"></script>
 <script>
-const D=window.MEMO_DATA;
-//CORE
-const norm=s=>String(s).toLowerCase().replace(/ё/g,'е');
-const toks=q=>norm(q).split(/\s+/).filter(Boolean);
-const hasQ=(txt,t)=>{const n=norm(txt);return t.every(w=>n.includes(w))};
-const EMPTY=['','х','x'];
-function filt(sec,st,ctx){
- const t=toks(st.q),B=st.banks,res={n:0,items:null,rows:null,cols:null,ign:false};
- if(sec.kind==='cards'){
-  if(B.size&&!sec.banks.some(b=>B.has(b))) return res;
-  res.items=sec.items.filter(i=>{
-   if(i.t==='note') return !B.size&&t.length>0&&hasQ(i.x,t)||(!B.size&&!t.length&&ctx==='sec');
-   if(B.size&&!i.b.some(b=>B.has(b))) return false;
-   return !t.length||hasQ(i.s,t)}).map(i=>i.kb&&B.size?{...i,kv:i.kv.filter((_,k)=>i.kb[k].some(b=>B.has(b)))}:i);
-  res.n=res.items.length;return res}
- let cols=sec.head.map((_,j)=>j);
- if(B.size){
-  if(sec.bc) cols=cols.filter(j=>j<sec.lab||sec.bc[j].some(b=>B.has(b)));
-  else if(sec.banks.length){ if(!sec.banks.some(b=>B.has(b))) return res }
-  else if(ctx==='res') return res; else res.ign=true}
- const nb=sec.bc&&B.size?cols.filter(j=>j>=sec.lab):[];
- if(sec.bc&&B.size&&!nb.length) return res;
- if(!sec.head.length) cols=sec.rows[0]?sec.rows[0].c.map((_,j)=>j):[];
- res.cols=cols;
- res.rows=sec.rows.filter(r=>{
-  if(r.sub) return true;
-  if(t.length&&!hasQ(r.c.join(' ')+' '+sec.head.join(' '),t)) return false;
-  if(nb.length&&!nb.some(j=>!EMPTY.includes(norm(r.c[j])))) return false;
-  return true});
- res.n=res.rows.filter(r=>!r.sub).length;return res}
-//ENDCORE
-const $=s=>document.querySelector(s),app=$('#app');
-const st={q:'',banks:new Set()};
-const esc=s=>String(s).replace(/"([А-Яа-яЁё][^"\n]{1,90})"/g,'«$1»').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function hl(s){const t=toks(st.q),re=t.length?new RegExp('('+t.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'):null;
- return String(s).split(/(https?:\/\/\S+)/).map((p,i)=>i%2?`<a href="${esc(p)}" target="_blank" rel="noopener">открыть ссылку ↗</a>`:(re?p.split(re).map((x,k)=>k%2?'<mark>'+esc(x)+'</mark>':esc(x)).join(''):esc(p))).join('').replace(/\n/g,'<br>')}
-function val(v){const k=norm(v).trim();
- if(['да','бесплатный','субсидия'].includes(k)) return `<span class="pill">${hl(v)}</span>`;
- if(['нет','-','—'].includes(k)) return `<span class="pill n">${hl(v)}</span>`;
- if(k==='стоп'||k==='стоп!') return `<span class="pill s">${hl(v)}</span>`;
- return hl(v)}
-const kv=a=>a.map(([h,v])=>`<div${v.length>110?' style="grid-column:1/-1"':''}>${h?`<dt>${esc(h)}</dt>`:''}<dd>${val(v)}</dd></div>`).join('');
-const card=c=>`<article class="card"><h3>${hl(c.n)}${c.g?`<small>${esc(c.g)}</small>`:''}</h3><dl>${kv(c.kv)}</dl>${c.more.map(m=>`<dl class="more">${kv(m)}</dl>`).join('')}</article>`;
-const items=a=>`<div class="cards">${a.map(i=>i.t==='note'?`<div class="note${i.h?' h':''}">${hl(i.x)}</div>`:card(i)).join('')}</div>`;
-function table(sec,r,lim){
- const rows=lim?r.rows.slice(0,lim):r.rows,cs=r.cols;
- const th=sec.head.length?`<thead><tr>${cs.map(j=>`<th>${hl(sec.head[j]||'')}</th>`).join('')}</tr></thead>`:'';
- const body=rows.map(x=>{const v=cs.map(j=>x.c[j]);const ne=v.filter(Boolean).length;
-  if(ne===1&&v.length>3) return `<tr><td class="span" colspan="${v.length}">${hl(v.find(Boolean))}</td></tr>`;
-  return `<tr class="${x.sub?'sub':''}">${v.map(c=>`<td class="${EMPTY.includes(norm(c))&&c?'x':''}">${c?hl(c):''}</td>`).join('')}</tr>`}).join('');
- return `<div class="tw"><table>${th}<tbody>${body}</tbody></table></div>`}
-const body=(sec,r,lim)=>sec.kind==='cards'?items(lim?r.items.slice(0,lim):r.items):table(sec,r,lim?lim*2:0);
-const active=()=>st.q.trim()||st.banks.size;
-const names=()=>[...st.banks].map(b=>D.banks.find(x=>x.id===b).n).join(', ');
-function home(){
- const nb=D.banks.length,tot=D.secs.length;
- let h=`<div class="memo-pagehead"><div class="memo-eyebrow">Справочник ипотечного брокера</div><h1>Памятка «Банки России 3.0»</h1><p>Выберите раздел или найдите условие по ключевому слову и банку.</p><div class="memo-rule" aria-hidden="true"></div></div>`;
- if(active()){
-  let any=0,s='';
-  D.secs.forEach(sec=>{const r=filt(sec,st,'res');if(!r.n)return;any+=r.n;
-   s+=`<section class="res"><h2><span>${esc(sec.t)} · ${r.n}</span><a href="#${sec.id}">Открыть раздел →</a></h2>${body(sec,r,12)}${r.n>12?`<a href="#${sec.id}">Показать все ${r.n} в разделе →</a>`:''}</section>`});
-  h+=`<div class="info">Результаты: <b>${any}</b>${st.q.trim()?` · запрос «${esc(st.q.trim())}»`:''}${st.banks.size?` · банки: ${esc(names())}`:''}</div>`;
-  h+=s||'<div class="empty">Ничего не найдено. Попробуйте другое слово или уберите часть банков.</div>';
-  return h}
- h+=`<div class="big">${D.groups.map((g,gi)=>`<button class="bg g${gi}" data-g="${gi}"><b>${g[0]}</b><small>${g[1]}</small></button>`).join('')}</div>`;
- return h+'<footer>Источник — файл «Банки_России_3_0.xlsx». Данные приведены как в файле; перед сделкой уточняйте актуальность условий в банке.</footer>'}
-function section(id){
- const sec=D.secs.find(s=>s.id===id);if(!sec) return home();
- const r=filt(sec,st,'sec');
- let h=`<a class="back" href="#">← На главную</a><nav class="tabs">${D.secs.filter(s=>s.g<4||s.id===id).map(s=>`<a href="#${s.id}" class="${s.id===id?'on':''}">${esc(s.t)}</a>`).join('')}</nav><h2 class="sh">${esc(sec.t)}</h2><p class="sub">${esc(sec.d)}</p>`;
- if(active()) h+=`<div class="info">Показано: <b>${r.n}</b> из ${sec.n}${st.q.trim()?` · «${esc(st.q.trim())}»`:''}${st.banks.size&&!r.ign?` · ${esc(names())}`:''}${r.ign?' · раздел не привязан к банкам — фильтр по банкам не применяется':''}<button class="lnk" style="padding:0" onclick="resetAll()">Сбросить</button></div>`;
- return h+(r.n?body(sec,r,0):'<div class="empty">В этом разделе нет совпадений.</div>')}
-function render(){const id=location.hash.slice(1);app.innerHTML=id?section(id):home();$('#cl').style.display=st.q?'block':'none';
- const n=st.banks.size;$('#bn').hidden=!n;$('#bn').textContent=n;$('#bb').classList.toggle('on',n>0);
- document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',st.banks.has(c.dataset.b)))}
-function resetAll(){st.q='';st.banks.clear();$('#q').value='';render()}
-$('#chips').innerHTML=D.banks.map(b=>`<button class="chip" data-b="${b.id}">${esc(b.n)}</button>`).join('');
-$('#chips').onclick=e=>{const b=e.target.dataset.b;if(!b)return;st.banks.has(b)?st.banks.delete(b):st.banks.add(b);render()};
-$('#bb').onclick=()=>{$('#bp').hidden=!$('#bp').hidden};$('#rs').onclick=resetAll;
-$('#cl').onclick=()=>{st.q='';$('#q').value='';render();$('#q').focus()};
-let tm;$('#q').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>{st.q=e.target.value;render()},150)};
-function toast(m){let e=$('#ts');if(!e){e=document.createElement('div');e.id='ts';document.body.appendChild(e)}e.textContent=m;e.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>e.className='',4000)}
-app.addEventListener('click',e=>{const b=e.target.closest('.cp');if(!b)return;const n=b.dataset.p,ok=()=>toast('Скопировано '+n+'. В Max: Контакты → «+» → «Найти по номеру»');
- const fb=()=>{const x=document.createElement('textarea');x.value=n;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(_){}x.remove();ok()};
- navigator.clipboard?navigator.clipboard.writeText(n).then(ok,fb):fb()});
-const closeM=()=>$('#md').classList.remove('on');
-app.addEventListener('click',e=>{const b=e.target.closest('.bg');if(!b)return;const gi=+b.dataset.g,g=D.groups[gi];
- $('#mb').innerHTML=`<h2>${g[0]}</h2><p class="sub">${g[1]}</p><div class="tiles g${gi}">`+D.secs.filter(s=>s.g===gi).map(s=>`<a class="tile" href="#${s.id}"><b>${esc(s.t)}</b><small>${esc(s.d)}</small></a>`).join('')+'</div>';$('#md').classList.add('on')});
-$('#mx').onclick=closeM;$('#md').onclick=e=>{if(e.target.id==='md'||e.target.closest('.tile'))closeM()};addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
-addEventListener('hashchange',()=>{render();scrollTo(0,0)});render();
-</script></body></html>
+const $ = selector => document.querySelector(selector);
+const app = $('#app');
+const query = $('#q');
+const bankFilter = $('#bb');
+const data = window.MEMO_DATA;
+
+if (!data) {
+  $('.memo-tools').hidden = true;
+  $('#status').textContent = 'Памятка не загрузилась. Условия доступны в Google Таблице.';
+} else {
+  initMemo(data);
+}
+
+function initMemo({ secs, groups, banks }) {
+  const state = { query: '', banks: new Set() };
+  const bankNames = new Map(banks.map(bank => [bank.id, bank.n]));
+  const sheetIds = {
+    s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
+    s5: 1123676935, s6: 1297562849, s7: 860172231, s8: 558231179, s9: 2109045961,
+    s10: 1163106320, s11: 808915854, s12: 31258751, s13: 832103270, s14: 2110526252,
+    s15: 623330971, s16: 277931211, s17: 1899907639, s18: 153621334, s19: 350246124,
+    s20: 1016212115, s21: 1268678502
+  };
+  const source = $('#source');
+  const sourceUrl = new URL(source.href);
+  const normal = text => String(text ?? '').toLowerCase().replace(/ё/g, 'е');
+  const capitalAlias = /мат[.\s]*(?:еринский\s+)?кап(?:итал)?|(?<![а-яё])мск(?![а-яё])/giu;
+  const searchable = text => normal(text).replace(capitalAlias, 'маткапитал');
+  const isEmpty = value => ['', 'х', 'x'].includes(normal(value).trim());
+  const esc = text => String(text ?? '').replace(/[&<>"]/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+  })[ch]);
+  const safeRegex = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let terms = [];
+  let highlight = null;
+
+  function matches(text) {
+    const value = searchable(text);
+    return terms.every(term => value.includes(term));
+  }
+
+  function richText(text) {
+    return String(text ?? '').split(/(https?:\/\/\S+)/g).map((part, index) => {
+      if (index % 2) return `<a href="${esc(part)}" target="_blank" rel="noopener">Открыть ссылку</a>`;
+      return (highlight
+        ? part.split(highlight).map((fragment, j) => j % 2 ? `<mark>${esc(fragment)}</mark>` : esc(fragment)).join('')
+        : esc(part)).replace(/\n/g, '<br>');
+    }).join('');
+  }
+
+  function filterSection(section, inSearch) {
+    const selected = state.banks;
+    const byBank = selected.size > 0;
+    const hasBankColumns = Boolean(section.bc);
+    const hasBankTags = section.banks.length > 0;
+    const filterUnavailable = byBank && !hasBankTags && !hasBankColumns;
+    const result = { count: 0, items: [], rows: [], columns: [], filterUnavailable };
+    if (byBank && hasBankTags && !hasBankColumns && !section.banks.some(bank => selected.has(bank))) return result;
+    if (inSearch && filterUnavailable) return result;
+
+    const sectionText = `${section.t} ${section.d}`;
+    if (section.kind === 'cards') {
+      result.items = section.items.flatMap(item => {
+        if (item.t === 'note') {
+          const show = terms.length ? matches(`${sectionText} ${item.x}`) : !inSearch;
+          return !byBank && show ? [item] : [];
+        }
+        if (byBank && !item.b.some(bank => selected.has(bank))) return [];
+        const entries = byBank && item.kb ? item.kv.filter((_, index) =>
+          item.kb[index]?.some(bank => selected.has(bank))) : item.kv;
+        const text = byBank && item.kb
+          ? [item.n, item.g, ...entries.flat(), ...item.more.flat(2)].join(' ')
+          : `${item.s} ${item.n} ${item.b.map(bank => bankNames.get(bank)).join(' ')}`;
+        return matches(`${sectionText} ${text}`) ? [{ ...item, kv: entries }] : [];
+      });
+      result.count = result.items.filter(item => terms.length || item.t !== 'note').length;
+      return result;
+    }
+
+    const width = section.head.length || Math.max(0, ...section.rows.map(row => row.c.length));
+    result.columns = Array.from({ length: width }, (_, index) => index);
+    if (byBank && hasBankColumns) {
+      result.columns = result.columns.filter(index =>
+        index < section.lab || section.bc[index]?.some(bank => selected.has(bank)));
+    }
+    const bankColumns = byBank && hasBankColumns ? result.columns.filter(index => index >= section.lab) : [];
+    if (byBank && hasBankColumns && !bankColumns.length) return result;
+    const headers = result.columns.map(index => section.head[index]).join(' ');
+    let blockHeading;
+    for (const row of section.rows) {
+      if (row.sub) {
+        if (!terms.length && !byBank) result.rows.push(row);
+        blockHeading = row;
+        continue;
+      }
+      if (bankColumns.length && bankColumns.every(index => isEmpty(row.c[index]))) continue;
+      const cells = result.columns.map(index => row.c[index]).join(' ');
+      const heading = blockHeading?.c.join(' ') ?? '';
+      if (!matches(`${sectionText} ${headers} ${heading} ${cells}`)) continue;
+      if (blockHeading && !result.rows.includes(blockHeading)) result.rows.push(blockHeading);
+      result.rows.push(row);
+      result.count++;
+    }
+    return result;
+  }
+
+  function value(text) {
+    const label = normal(text).trim();
+    if (['да', 'бесплатный', 'субсидия'].includes(label)) return `<span class="pill">${richText(text)}</span>`;
+    if (['нет', '-', '—'].includes(label)) return `<span class="pill n">${richText(text)}</span>`;
+    if (['стоп', 'стоп!'].includes(label)) return `<span class="pill s">${richText(text)}</span>`;
+    return richText(text);
+  }
+
+  function fields(entries) {
+    return `<dl>${entries.map(([label, text]) => `<div><dt>${richText(label)}</dt><dd>${value(text)}</dd></div>`).join('')}</dl>`;
+  }
+
+  function card(item) {
+    if (item.t === 'note') return `<div class="note${item.h ? ' h' : ''}">${richText(item.x)}</div>`;
+    const limit = !terms.length && item.kv.length > 7 ? 4 : item.kv.length;
+    const extras = item.kv.slice(limit);
+    const extraFields = extras.length ? fields(extras) : '';
+    const more = item.more.map(entries => `<div class="memo-more">${fields(entries)}</div>`).join('');
+    return `<article class="card"><h3>${richText(item.n)}${item.g ? `<small>${esc(item.g)}</small>` : ''}</h3>
+      ${fields(item.kv.slice(0, limit))}
+      ${extraFields ? `<details class="memo-card-details"><summary>Все условия</summary>${extraFields}${more}</details>` : more}
+      </article>`;
+  }
+
+  function table(section, result) {
+    const columns = result.columns;
+    const head = section.head.length
+      ? `<thead><tr>${columns.map(index => `<th scope="col">${richText(section.head[index])}</th>`).join('')}</tr></thead>`
+      : '';
+    const rows = result.rows.map(row => {
+      const cells = columns.map(index => row.c[index]);
+      const filled = cells.filter(Boolean);
+      if (filled.length === 1 && cells.length > 3) {
+        return `<tr><td class="span" colspan="${cells.length}">${richText(filled[0])}</td></tr>`;
+      }
+      return `<tr${row.sub ? ' class="sub"' : ''}>${cells.map(cell =>
+        `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${richText(cell)}</td>`).join('')}</tr>`;
+    }).join('');
+    return `<p class="memo-table-hint">Прокрутите таблицу, чтобы увидеть остальные столбцы.</p>
+      <div class="tw" tabindex="0" role="region" aria-label="${esc(section.t)}"><table>${head}<tbody>${rows}</tbody></table></div>`;
+  }
+
+  function entry(section, subtitle) {
+    return `<a class="memo-entry" href="#${esc(section.id)}"><b>${esc(section.t)}</b><small>${esc(subtitle)}</small></a>`;
+  }
+
+  function catalog() {
+    return `<div class="memo-catalog">${groups.map(([title, description], index) => {
+      const sections = secs.filter(section => section.g === index);
+      return sections.length ? `<section><h2>${esc(title)}</h2><p>${esc(description)}</p>
+        <div class="memo-grid">${sections.map(section => entry(section, section.d)).join('')}</div></section>` : '';
+    }).join('')}</div>`;
+  }
+
+  const plural = new Intl.PluralRules('ru');
+  const labels = { one: 'совпадение', few: 'совпадения', many: 'совпадений' };
+  const countLabel = count => `${count} ${labels[plural.select(count)]}`;
+
+  function searchResults() {
+    const found = secs.map(section => [section, filterSection(section, true)]).filter(([, result]) => result.count);
+    const total = found.reduce((sum, [, result]) => sum + result.count, 0);
+    $('#status').textContent = total ? `Найдено: ${countLabel(total)}` : 'Совпадений нет';
+    return total
+      ? `<section class="memo-results"><h2>Разделы с совпадениями</h2><div class="memo-grid">${found.map(([section, result]) => entry(section, countLabel(result.count))).join('')}</div></section>`
+      : '<p class="empty">Попробуйте другое слово или измените фильтр по банкам.</p>';
+  }
+
+  function detail(section, active) {
+    const result = filterSection(section, false);
+    if (active) {
+      $('#status').textContent = (result.count ? `В разделе: ${countLabel(result.count)}` : 'В разделе нет совпадений') +
+        (result.filterUnavailable ? '. Для этого раздела фильтр по банкам недоступен.' : '');
+    }
+    const nav = groups.map(([title], index) => {
+      const sections = secs.filter(item => item.g === index);
+      return sections.length ? `<optgroup label="${esc(title)}">${sections.map(option).join('')}</optgroup>` : '';
+    }).join('');
+    function option(item) {
+      return `<option value="${esc(item.id)}"${item.id === section.id ? ' selected' : ''}>${esc(item.t)}</option>`;
+    }
+    const contents = section.kind === 'cards'
+      ? (result.items.length ? `<div class="cards">${result.items.map(card).join('')}</div>` : '')
+      : (result.rows.length ? table(section, result) : '');
+    return `<section class="memo-section">
+      <nav class="memo-section-nav" aria-label="Разделы памятки">
+        <a class="memo-source" href="#">${active ? 'К результатам поиска' : 'Все разделы памятки'}</a>
+        <label for="memo-sections">Раздел
+          <select id="memo-sections">${nav}${section.g >= groups.length ? option(section) : ''}</select>
+        </label>
+      </nav>
+      <h2 class="sh" tabindex="-1">${esc(section.t)}</h2><p class="sub">${esc(section.d)}</p>
+      ${contents || '<p class="empty">Попробуйте изменить поиск или фильтр по банкам.</p>'}
+      </section>`;
+  }
+
+  function render() {
+    terms = searchable(state.query).trim().split(/\s+/).filter(Boolean);
+    const phrases = terms.map(term => term === 'маткапитал' ? capitalAlias.source : safeRegex(term).replace(/е/g, '[её]'));
+    highlight = phrases.length ? new RegExp(`(${phrases.join('|')})`, 'giu') : null;
+    const section = secs.find(item => item.id === location.hash.slice(1));
+    const active = Boolean(terms.length || state.banks.size);
+    const filterButtons = $('#selected');
+    const focusedRemoval = filterButtons.contains(document.activeElement);
+    sourceUrl.searchParams.set('gid', sheetIds[section?.id] ?? '1749938485');
+    source.href = sourceUrl.href;
+    source.textContent = section ? 'Открыть вкладку в Google Таблице' : 'Открыть Google Таблицу';
+    $('#status').textContent = '';
+    app.innerHTML = section ? detail(section, active) : active ? searchResults() : catalog();
+    $('#cl').style.display = state.query ? 'block' : 'none';
+    $('#bn').textContent = state.banks.size;
+    $('#bn').hidden = !state.banks.size;
+    bankFilter.classList.toggle('on', Boolean(state.banks.size));
+    $('#filters').hidden = !active;
+    const selected = banks.filter(bank => state.banks.has(bank.id));
+    filterButtons.innerHTML = selected.map(bank => `<button class="chip on" type="button" data-remove="${esc(bank.id)}"
+      aria-label="Убрать банк ${esc(bank.n)}">${esc(bank.n)} ×</button>`).join('');
+    if (focusedRemoval) (filterButtons.querySelector('button') || bankFilter).focus();
+    $('#chips').querySelectorAll('button').forEach(button => {
+      const pressed = state.banks.has(button.dataset.bank);
+      button.setAttribute('aria-pressed', String(pressed));
+      button.classList.toggle('on', pressed);
+    });
+  }
+
+  function setBankPanel(open) {
+    $('#bp').hidden = !open;
+    bankFilter.setAttribute('aria-expanded', String(open));
+  }
+
+  $('#chips').innerHTML = banks.map(bank =>
+    `<button class="chip" type="button" data-bank="${esc(bank.id)}" aria-pressed="false">${esc(bank.n)}</button>`).join('');
+  bankFilter.addEventListener('click', () => setBankPanel($('#bp').hidden));
+  $('#chips').addEventListener('click', event => {
+    const button = event.target.closest('[data-bank]');
+    if (!button) return;
+    const bank = button.dataset.bank;
+    if (state.banks.has(bank)) state.banks.delete(bank);
+    else state.banks.add(bank);
+    render();
+  });
+  $('#selected').addEventListener('click', event => {
+    const button = event.target.closest('[data-remove]');
+    if (!button) return;
+    state.banks.delete(button.dataset.remove);
+    render();
+  });
+  let timer;
+  query.addEventListener('input', () => {
+    clearTimeout(timer);
+    state.query = query.value;
+    timer = setTimeout(render, 140);
+  });
+  function clearQuery() {
+    clearTimeout(timer);
+    state.query = query.value = '';
+    render();
+    query.focus();
+  }
+  $('#cl').addEventListener('click', clearQuery);
+  $('#rs').addEventListener('click', () => {
+    state.banks.clear();
+    clearQuery();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !$('#bp').hidden) {
+      setBankPanel(false);
+      bankFilter.focus();
+    }
+  });
+  app.addEventListener('change', event => {
+    if (event.target.id === 'memo-sections') location.hash = event.target.value;
+  });
+  addEventListener('hashchange', () => {
+    setBankPanel(false);
+    render();
+    const heading = $('.memo-section h2');
+    const target = heading || query;
+    target.focus({ preventScroll: true });
+    if (window.frameElement) {
+      const scrollTop = window.parent.scrollY;
+      const frameTop = window.frameElement.getBoundingClientRect().top + scrollTop;
+      const offset = window.parent.document.querySelector('header')?.offsetHeight ?? 0;
+      if (scrollTop > frameTop - offset) window.parent.scrollTo(0, frameTop - offset);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  });
+  render();
+}
+</script>
+</body></html>
