@@ -157,7 +157,7 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
   <p class="memo-status" id="status" role="status"></p>
   <div id="app"></div>
 </main>
-<script src="./memo-data.js?v=family-s2-20261119"></script>
+<script src="./memo-data.js?v=20261126"></script>
 <script>
 const $ = selector => document.querySelector(selector);
 const app = $('#app');
@@ -253,6 +253,13 @@ function initMemo({ secs, groups, banks }) {
     const headers = result.columns.map(index => section.head[index]).join(' ');
     let blockHeading;
     for (const row of section.rows) {
+      if (row.span) {
+        if (matches(`${sectionText} ${row.c[0]}`)) {
+          result.rows.push(row);
+          if (terms.length) result.count++;
+        }
+        continue;
+      }
       if (row.sub) {
         if (!terms.length && !byBank) result.rows.push(row);
         blockHeading = row;
@@ -299,11 +306,10 @@ function initMemo({ secs, groups, banks }) {
       ? `<thead><tr>${columns.map(index => `<th scope="col">${richText(section.head[index])}</th>`).join('')}</tr></thead>`
       : '';
     const rows = result.rows.map(row => {
-      const cells = columns.map(index => row.c[index]);
-      const filled = cells.filter(Boolean);
-      if (filled.length === 1 && cells.length > 3) {
-        return `<tr><td class="span" colspan="${cells.length}">${richText(filled[0])}</td></tr>`;
+      if (row.span) {
+        return `<tr><td class="span" colspan="${columns.length}">${richText(row.c[0])}</td></tr>`;
       }
+      const cells = columns.map(index => row.c[index]);
       return `<tr${row.sub ? ' class="sub"' : ''}>${cells.map(cell =>
         `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${richText(cell)}</td>`).join('')}</tr>`;
     }).join('');
