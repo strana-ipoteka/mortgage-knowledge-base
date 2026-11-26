@@ -350,8 +350,10 @@ function initMemo({ secs, groups, banks }) {
   function catalog() {
     return `<div class="memo-catalog">${groups.map(([title, description], index) => {
       const sections = secs.filter(section => section.g === index);
+      const cards = sections.map(section =>
+        entry(section, section.id === 's2' ? 'ПВ, сроки и условия банков' : section.d));
       return sections.length ? `<section><h2>${esc(title)}</h2><p>${esc(description)}</p>
-        <div class="memo-grid">${sections.map(section => entry(section, section.d)).join('')}</div></section>` : '';
+        <div class="memo-grid">${cards.join('')}</div></section>` : '';
     }).join('')}</div>`;
   }
 
