@@ -565,7 +565,7 @@ function initMemo({ secs, groups, banks }) {
         const blocks = [...durations].map(([term, duration]) => {
           const ordered = [...duration.offers].sort((a, b) => a.bank.column - b.bank.column);
           const offers = ordered.map(({ bank, fee, note, headerNote }) =>
-            `<div><dt>${bankLabel(bank.name, bank.id)}</dt><dd>${richText(fee || '—')}
+            `<div><dt>${bankLabel(bank.name, bank.id)}</dt><dd>${richText(isEmpty(fee) ? 'КВ —' : `КВ ${fee}`)}
               ${cellNote(note, `${bank.name} · КВ`)}${cellNote(headerNote, bank.name)}</dd></div>`).join('');
           const termNotes = [...duration.notes].map(note => cellNote(note, 'Срок')).join('');
           return `<section class="family-term"><h4>Срок · ${richText(term || '—')}</h4>${termNotes}
