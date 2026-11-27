@@ -199,7 +199,7 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .general-compare { padding: 12px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
 .compare-banks, .compare-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 8px }
 .compare-options { margin-top: 10px; align-items: end }
-.compare-object { margin-bottom: 10px }
+.property-label { display: block; margin-bottom: 5px; color: var(--mu); font-size: 14px; font-weight: 600 }
 .general-compare label { font-size: 14px }
 .general-compare select { display: block; width: 100%; min-width: 0; min-height: 40px; margin-top: 4px; padding: 0 8px; border: 1px solid var(--ln); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit }
 .compare-differences { display: flex; gap: 6px; align-items: center; min-height: 40px }
@@ -466,9 +466,7 @@ function initMemo({ secs, groups, banks }) {
 
   function generalComparison(section, general) {
     const cards = section.items.filter(item => item.t === 'card');
-    const groups = [...new Set(cards.map(item => item.g).filter(Boolean))];
-    if (groups.length && !groups.includes(general.group)) general.group = groups[0];
-    const available = cards.filter(item => (!groups.length || item.g === general.group)
+    const available = cards.filter(item => (!general.group || item.g === general.group)
       && (!state.banks.size || item.b.some(id => state.banks.has(id))));
     const bankCounts = new Map();
     for (const { b } of available) bankCounts.set(b[0], (bankCounts.get(b[0]) ?? 0) + 1);
@@ -505,10 +503,6 @@ function initMemo({ secs, groups, banks }) {
         ).join('')}</select></label>`).join('');
     const conditionOptions = [...labels].map(([id, label]) =>
       `<option value="${esc(id)}"${general.condition === id ? ' selected' : ''}>${esc(label.replace(/\s+/g, ' '))}</option>`).join('');
-    const groupPicker = groups.length > 1 ? `<div class="compare-object"><label for="compare-group">
-      Тип объекта<select id="compare-group">${groups.map(group =>
-        `<option value="${esc(group)}"${general.group === group ? ' selected' : ''}>${esc(group)}</option>`).join('')}
-      </select></label></div>` : '';
     const cell = (entry, label) => {
       const [, text, note] = entry ?? [];
       return (text && !isEmpty(text) ? generalValue(text) : '<span class="compare-missing">Не указано</span>') + cellNote(note, label);
@@ -524,7 +518,7 @@ function initMemo({ secs, groups, banks }) {
           <table><thead><tr><th scope="col">Условие</th>${head}</tr></thead><tbody>${tableRows}</tbody></table></div>
         <div class="loyalty-rows compare-rows">${compact}</div>`
       : `<p class="empty">${!selected.length ? 'Выберите банки для сравнения.' : 'Нет условий, подходящих под выбранные фильтры.'}</p>`;
-    return `<div class="general-compare">${groupPicker}<div class="compare-banks">${bankOptions}</div>
+    return `<div class="general-compare"><div class="compare-banks">${bankOptions}</div>
       <div class="compare-options"><label for="compare-condition">Условие<select id="compare-condition">
         <option value="">Все условия</option>${conditionOptions}</select></label>
         <label class="compare-differences"><input id="compare-differences" type="checkbox"
@@ -533,12 +527,31 @@ function initMemo({ secs, groups, banks }) {
   }
 
   function generalConditions(section, result, general) {
+    const groups = [...new Set(section.items.filter(item => item.t === 'card').map(item => item.g).filter(Boolean))];
+    if (groups.length && !groups.includes(general.group)) general.group = groups[0];
+    const filterKey = JSON.stringify([state.query, [...state.banks].sort()]);
+    const typeLabel = group => group === 'Кладовки' ? 'Кладовка' : group;
+    if (groups.length && general.groupFilterKey !== filterKey) {
+      const matches = result.items.filter(item => item.t === 'card').map(item => item.g);
+      const requested = groups.find(group =>
+        [group, typeLabel(group)].some(label => normal(label) === normal(state.query).trim()));
+      if (requested) general.group = requested;
+      else if (matches.length && !matches.includes(general.group)) general.group = matches[0];
+      general.groupFilterKey = filterKey;
+    }
+    const propertyPicker = groups.length > 1 ? `<span class="property-label" id="property-label">Тип объекта</span>
+      <div class="general-views" role="group" aria-labelledby="property-label">${groups.map((group, index) =>
+        `<button type="button" id="property-type-${index}" data-property-type="${esc(group)}"
+          aria-pressed="${general.group === group}">${esc(typeLabel(group))}</button>`
+      ).join('')}</div>` : '';
+    const items = general.group ? result.items.filter(item => item.t === 'card'
+      ? item.g === general.group : !groups.includes(item.x) || item.x === general.group && item.note) : result.items;
     const tabs = [['list', 'По банкам'], ['compare', 'Сравнить банки']].map(([id, label]) =>
       `<button type="button" id="general-${id}" data-general-view="${id}" aria-pressed="${general.view === id}">${label}</button>`).join('');
-    const content = general.view === 'compare' ? generalComparison(section, general) : result.items.length
-      ? `<div class="cards">${result.items.map(item => card(item, { renderValue: generalValue })).join('')}</div>`
+    const content = general.view === 'compare' ? generalComparison(section, general) : items.length
+      ? `<div class="cards">${items.map(item => card(item, { renderValue: generalValue })).join('')}</div>`
       : '<p class="empty">Попробуйте изменить поиск или фильтр по банкам.</p>';
-    return `<div class="general-views" role="group" aria-label="Вид общих условий">${tabs}</div>${content}`;
+    return `${propertyPicker}<div class="general-views" role="group" aria-label="Вид условий">${tabs}</div>${content}`;
   }
 
   function trancheView(section, result) {
@@ -1034,10 +1047,15 @@ function initMemo({ secs, groups, banks }) {
     }
   });
   app.addEventListener('click', event => {
-    const button = event.target.closest('[data-general-view]');
+    const button = event.target.closest('[data-general-view], [data-property-type]');
     const general = comparisons.get(location.hash.slice(1));
     if (!button || !general) return;
-    general.view = button.dataset.generalView;
+    if (button.dataset.propertyType !== undefined) {
+      general.group = button.dataset.propertyType;
+      general.condition = '';
+    } else {
+      general.view = button.dataset.generalView;
+    }
     render();
     document.getElementById(button.id).focus({ preventScroll: true });
   });
@@ -1047,10 +1065,6 @@ function initMemo({ secs, groups, banks }) {
     if (general && (dataset.compareBank !== undefined || id.startsWith('compare-'))) {
       if (dataset.compareBank !== undefined) general.banks[Number(dataset.compareBank)] = value;
       else if (id === 'compare-condition') general.condition = value;
-      else if (id === 'compare-group') {
-        general.group = value;
-        general.condition = '';
-      }
       else general.differences = checked;
       render();
       document.getElementById(id)?.focus({ preventScroll: true });
