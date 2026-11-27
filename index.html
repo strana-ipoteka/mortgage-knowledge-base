@@ -234,7 +234,7 @@ function renderTeam(){
 let embeddedResizeObserver=null;
 function embeddedSection(section){
  if(embeddedResizeObserver){embeddedResizeObserver.disconnect();embeddedResizeObserver=null;}
- const version = {'banks-memo':'20261127-9',documents:'20261127-1'}[section.id];
+ const version = {'banks-memo':'20261127-10',documents:'20261127-1'}[section.id];
  const query=version?'?embedded=1&v='+version:'?embedded=1';
  app.innerHTML='<div class="embedded-section"><div class="embedded-nav"><a class="back" href="#home">← Назад к разделам</a></div><iframe class="embedded-frame" title="'+esc(section.title)+'" src="'+esc(section.url+query)+'" loading="eager"></iframe></div>';
  const frame=app.querySelector('.embedded-frame');

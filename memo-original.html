@@ -177,6 +177,31 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .tranche-details details > div { margin-top: 6px; overflow-wrap: anywhere }
 .tranche-details ul { margin: 0; padding-inline-start: 20px }
 .tranche-details ul + ul { margin-top: 10px }
+.family-conditions { padding: 14px; border: 1px solid var(--ln); border-radius: 14px; background: var(--sf) }
+.family-controls, .family-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+.family-controls label { display: grid; gap: 4px; font-size: 13px; font-weight: 600 }
+.family-controls select { width: 100%; min-height: 40px; padding: 0 7px; border: 1px solid var(--ln); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit }
+.family-results { margin-top: 10px }
+.family-result { min-width: 0; padding: 10px; border: 1px solid var(--ln); border-radius: 9px; background: var(--bg); overflow-wrap: anywhere }
+.family-result h3 { margin: 0 0 5px; font-size: 14px; line-height: 1.3 }
+.family-result dl { display: flex; flex-wrap: wrap; gap: 6px 16px }
+.family-result dl div { border: 0 }
+.family-result dd { margin-top: 2px; font-weight: 700 }
+.family-result .family-rate-value { color: var(--bb); font-size: 22px; line-height: 1.2 }
+.family-rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px }
+.family-rules details { min-width: 0; border: 1px solid var(--ln); border-radius: 8px; padding: 7px; overflow-wrap: anywhere }
+.family-rules details[open] { grid-column: 1 / -1 }
+.family-rules summary { cursor: pointer; font-size: 13px; font-weight: 600 }
+.family-rule-text { margin-top: 7px }
+@media (max-width: 580px) {
+  body:has(.family-conditions) .brand { display: none }
+  body:has(.family-conditions) .memo-pagehead :is(h1, p) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%) }
+  body:has(.family-conditions) .memo-pagehead,
+  body:has(.family-conditions) .memo-tools,
+  body:has(.family-conditions) .memo-section-nav { margin-bottom: 9px }
+  .family-conditions { padding: 9px }
+  .family-result { padding: 7px }
+}
 .memo-tools :focus-visible, .memo-results :focus-visible, .memo-catalog :focus-visible, .memo-section :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 @media (max-width: 580px) {
   .memo-tools { padding: 12px }
@@ -235,7 +260,7 @@ if (!data) {
 }
 
 function initMemo({ secs, groups, banks }) {
-  const state = { query: '', banks: new Set() };
+  const state = { query: '', banks: new Set(), family: { region: '', children: '', query: '' } };
   const bankNames = new Map(banks.map(bank => [bank.id, bank.n]));
   const sheetIds = {
     s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
@@ -283,6 +308,10 @@ function initMemo({ secs, groups, banks }) {
     if (inSearch && filterUnavailable) return result;
 
     const sectionText = [section.t, section.d, ...(section.notes ?? []).flat()].join(' ');
+    if (section.id === 's3') {
+      const conditions = familyConditions(section, sectionText);
+      if (conditions) return { ...result, ...conditions };
+    }
     if (section.id === 's9') return standardSubsidy(section, sectionText);
     if (familySubsidy(section)) return groupedFamilySubsidy(section, sectionText);
     if (section.kind === 'loyalty') {
@@ -675,6 +704,78 @@ function initMemo({ secs, groups, banks }) {
       <div class="tw" tabindex="0" role="region" aria-label="${esc(section.t)}"><table>${head}<tbody>${rows}</tbody></table></div>`;
   }
 
+  function familyConditions(section, context) {
+    const [heading, counts, , ...matrix] = section.rows.filter(row => !row.span && !row.sub);
+    if (!heading || !counts || !matrix.length) return null;
+    const scenarios = [];
+    const columns = [];
+    for (const [index, headingText] of heading.c.entries()) {
+      if (!/^\d+$/.test(counts.c[index])) continue;
+      if (headingText) scenarios.push(headingText);
+      if (scenarios.length) columns.push({ index, children: counts.c[index], scenario: scenarios.at(-1) });
+    }
+    const choices = matrix.flatMap(row => columns.flatMap(({ index, children, scenario }) => {
+      const [region, amount] = row.c;
+      const rate = row.c[index];
+      return region && amount && !isEmpty(rate) ? [{ region, amount, rate, children, scenario, row, index }] : [];
+    }));
+    if (!choices.length) return null;
+
+    const rules = section.rows.filter(row => row.span);
+    const groups = new Map([
+      ['Как считать детей', [{ c: [counts.c[0]], notes: counts.notes }]],
+      ['Льготный период', []],
+      ['Регистрация', []],
+    ]);
+    let topic = 'Как считать детей';
+    for (const row of rules) {
+      if (/льготный период/i.test(row.c[0])) topic = 'Льготный период';
+      if (/подтверждать регистрацию/i.test(row.c[0])) topic = 'Регистрация';
+      groups.get(topic).push(row);
+    }
+    const hits = choices.filter(choice => matches([context, choice.region, choice.children, 'ребёнок детей',
+      choice.scenario, choice.amount, choice.rate, choice.row.notes?.[choice.index]].join(' ')));
+    const notesCount = [...groups].reduce((total, [title, rows]) =>
+      total + rows.filter(row => matches([context, title, row.c[0], row.notes?.[0]].join(' '))).length, 0);
+    return { scenarios, choices, hits, rules: groups, count: hits.length + notesCount };
+  }
+
+  function familyConditionsView(result) {
+    const current = state.family;
+    const regions = [...new Set(result.choices.map(choice => choice.region))];
+    const children = [...new Set(result.choices.map(choice => choice.children))].sort((a, b) => Number(a) - Number(b));
+    if (!regions.includes(current.region)) current.region = regions[0];
+    if (!children.includes(current.children)) current.children = children[0];
+    if (current.query !== state.query && terms.length && result.hits.length
+        && !result.hits.some(choice => choice.region === current.region && choice.children === current.children)) {
+      current.region = result.hits[0].region;
+      current.children = result.hits[0].children;
+    }
+    current.query = state.query;
+    const select = (id, label, options, selected) => `<label for="family-${id}">${label}
+      <select id="family-${id}" data-family-choice="${id}">${options.map(option =>
+        `<option value="${esc(option)}"${option === selected ? ' selected' : ''}>${esc(option.replace(/\s+/g, ' ').replace('СПБ/ЛО', 'СПб/ЛО'))}</option>`).join('')}</select></label>`;
+    const items = result.choices.filter(choice => choice.region === current.region && choice.children === current.children);
+    const cards = result.scenarios.map(scenario => {
+      const label = /^семья с 1-м ребенком до 7 лет$/i.test(scenario)
+        ? 'Есть ребёнок до 7 лет' : scenario.split('\n').map(line => line.replace(/^\s*-\s*/, '')).join(' / ');
+      const offers = items.filter(choice => choice.scenario === scenario);
+      return `<article class="family-result"><h3>${richText(label)}</h3>${offers.length ? offers.map(choice => `<dl>
+        <div><dt>Ставка</dt><dd class="family-rate-value">${richText(choice.rate)}</dd></div>
+        <div><dt>Макс. сумма</dt><dd>${richText(choice.amount.replace(/\s*млн$/i, ' млн ₽'))}</dd></div>
+        </dl>${cellNote(choice.row.notes?.[choice.index], label)}`).join('') : '<p>Условия не указаны</p>'}</article>`;
+    }).join('');
+    const notes = [...result.rules].filter(([, rows]) => rows.length).map(([title, rows]) =>
+      `<details${terms.length && rows.some(row => matches([title, row.c[0], row.notes?.[0]].join(' '))) ? ' open' : ''}>
+        <summary>${title}</summary>${rows.map(row => `<div class="family-rule-text">${richText(row.c[0])}
+          ${cellNote(row.notes?.[0], title)}</div>`).join('')}</details>`).join('');
+    return `<div class="family-conditions"><div class="family-controls">
+      ${select('region', 'Регион', regions, current.region)}
+      ${select('children', 'Количество детей', children, current.children)}
+      </div><div class="family-results" aria-live="polite">${cards}</div>
+      <div class="family-rules">${notes}</div></div>`;
+  }
+
   function entry(section, subtitle) {
     return `<a class="memo-entry" href="#${esc(section.id)}"><b>${bankLabel(section.t)}</b><small>${esc(subtitle)}</small></a>`;
   }
@@ -718,6 +819,7 @@ function initMemo({ secs, groups, banks }) {
     let contents = '';
     if (section.id === 's9') contents = standardSubsidyView(section, result);
     else if (familySubsidy(section)) contents = groupedFamilySubsidyView(result);
+    else if (section.id === 's3' && result.choices && result.count) contents = familyConditionsView(result);
     else if (section.id === 's7' && result.items.length) contents = trancheView(section, result);
     else if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
     else if (section.kind === 'cards' && result.items.length) contents = `<div class="cards">${result.items.map(card).join('')}</div>`;
@@ -811,6 +913,12 @@ function initMemo({ secs, groups, banks }) {
   });
   app.addEventListener('change', event => {
     if (event.target.id === 'memo-sections') location.hash = event.target.value;
+    const field = event.target.dataset.familyChoice;
+    if (field === 'region' || field === 'children') {
+      state.family[field] = event.target.value;
+      render();
+      $(`#family-${field}`).focus({ preventScroll: true });
+    }
   });
   addEventListener('hashchange', () => {
     setBankPanel(false);
