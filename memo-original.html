@@ -193,6 +193,26 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .family-rules details[open] { grid-column: 1 / -1 }
 .family-rules summary { cursor: pointer; font-size: 13px; font-weight: 600 }
 .family-rule-text { margin-top: 7px }
+.general-views { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px }
+.general-views button { min-height: 40px; padding: 7px 12px; border: 1px solid var(--ln); border-radius: 9px; background: var(--sf); color: var(--tx); font: inherit; font-weight: 600; cursor: pointer }
+.general-views button[aria-pressed="true"] { background: var(--bb); border-color: var(--bb); color: var(--sf) }
+.general-compare { padding: 12px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
+.compare-banks, .compare-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 8px }
+.compare-options { margin-top: 10px; align-items: end }
+.general-compare label { font-size: 14px }
+.general-compare select { display: block; width: 100%; min-width: 0; min-height: 40px; margin-top: 4px; padding: 0 8px; border: 1px solid var(--ln); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit }
+.compare-differences { display: flex; gap: 6px; align-items: center; min-height: 40px }
+.compare-table th:first-child { width: 24% }
+body:has(.memo-return) .compare-table tbody th { position: static; color: var(--tx); background: var(--sf); box-shadow: none }
+.compare-table td { white-space: normal }
+.compare-rows .card h3 { margin-bottom: 8px }
+.compare-rows .card dt { text-transform: none }
+.compare-missing { color: var(--mu); font-size: 13px }
+.answer-word { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 13px; line-height: 1.4; font-weight: 700 }
+.answer-yes { background: #dcf6e7; color: #075934 }
+.answer-no { background: #ffe4e7; color: #9e2637 }
+:root[data-theme="dark"] .answer-yes { background: #194335; color: #c3f3d8 }
+:root[data-theme="dark"] .answer-no { background: #632b38; color: #ffd6dc }
 @media (max-width: 580px) {
   body:has(.family-conditions) .brand { display: none }
   body:has(.family-conditions) .memo-pagehead :is(h1, p) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%) }
@@ -261,6 +281,7 @@ if (!data) {
 
 function initMemo({ secs, groups, banks }) {
   const state = { query: '', banks: new Set(), family: { region: '', children: '', query: '' } };
+  const general = { view: 'list', banks: ['', '', ''], filterKey: null, condition: '', differences: false };
   const bankNames = new Map(banks.map(bank => [bank.id, bank.n]));
   const sheetIds = {
     s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
@@ -399,25 +420,98 @@ function initMemo({ secs, groups, banks }) {
     return BankLogos.icon(bankId) + richText(label);
   }
 
-  function fields(entries, bankLabels = false) {
+  function fields(entries, bankLabels = false, renderValue = value) {
     return `<dl>${entries.map(([label, text, note]) =>
-      `<div><dt>${bankLabels ? bankLabel(label) : richText(label)}</dt><dd>${value(text)}${cellNote(note, label)}</dd></div>`).join('')}</dl>`;
+      `<div><dt>${bankLabels ? bankLabel(label) : richText(label)}</dt><dd>${renderValue(text)}${cellNote(note, label)}</dd></div>`).join('')}</dl>`;
   }
 
-  function card(item) {
+  function card(item, { renderValue = value } = {}) {
     if (item.t === 'note') return `<div class="note${item.h ? ' h' : ''}">${richText(item.x)}${cellNote(item.note)}</div>`;
     const limit = !terms.length && item.kv.length > 7 ? 4 : item.kv.length;
     const extras = item.kv.slice(limit);
-    const extraFields = extras.length ? fields(extras, Boolean(item.kb)) : '';
-    const more = item.more.map(entries => `<div class="memo-more">${fields(entries)}</div>`).join('');
+    const extraFields = extras.length ? fields(extras, Boolean(item.kb), renderValue) : '';
+    const more = item.more.map(entries => `<div class="memo-more">${fields(entries, false, renderValue)}</div>`).join('');
     const title = item.b.length > 1 && !item.kb
       ? item.n.split(/([,\n])(?![^()]*\))/).map(part => bankLabel(part)).join('')
       : bankLabel(item.n, item.kb ? undefined : item.b[0]);
     return `<article class="card"><h3>${title}${item.g ? `<small>${esc(item.g)}</small>` : ''}</h3>
       ${cellNote(item.note, item.n)}
-      ${fields(item.kv.slice(0, limit), Boolean(item.kb))}
+      ${fields(item.kv.slice(0, limit), Boolean(item.kb), renderValue)}
       ${extraFields ? `<details class="memo-card-details"><summary>Все условия</summary>${extraFields}${more}</details>` : more}
       </article>`;
+  }
+
+  function generalValue(text) {
+    const trimmed = String(text ?? '').trimStart();
+    const answer = /^(да|нет)(?=$|[\s/.,:;!?()—-])/iu.exec(trimmed);
+    if (!answer) return value(text);
+    const yes = normal(answer[0]) === 'да';
+    return `<span class="answer-word answer-${yes ? 'yes' : 'no'}">${richText(yes ? 'Да' : 'Нет')}</span>${richText(trimmed.slice(answer[0].length))}`;
+  }
+
+  function generalComparison(section) {
+    const available = section.items.filter(item => item.t === 'card'
+      && (!state.banks.size || item.b.some(id => state.banks.has(id))));
+    const byId = new Map(available.map(item => [item.b[0] ?? item.n, item]));
+    const filterKey = [...state.banks].sort().join(',');
+    if (general.filterKey !== filterKey) {
+      const defaults = [...byId.keys()].slice(0, state.banks.size ? 3 : 2);
+      general.banks = Array.from({ length: 3 }, (_, index) => defaults[index] ?? '');
+      general.filterKey = filterKey;
+    }
+    const selected = general.banks.map(id => byId.get(id)).filter(Boolean);
+    const key = text => normal(text).replace(/\s+/g, ' ').trim();
+    const labels = new Map();
+    const bankFields = new Map(available.map(item => [item, new Map(item.kv.map(entry => {
+      const id = key(entry[0]);
+      if (!labels.has(id)) labels.set(id, entry[0]);
+      return [id, entry];
+    }))]));
+    if (!labels.has(general.condition)) general.condition = '';
+    const rows = [...labels].flatMap(([id, label]) => {
+      if (general.condition && general.condition !== id) return [];
+      const cells = selected.map(item => bankFields.get(item).get(id));
+      const queryMatch = matches([section.t, section.d, label, ...selected.map(item => item.n), ...cells.flat()].join(' '));
+      const differences = new Set(cells.map(entry => key(entry?.[1]) + '\n' + key(entry?.[2]))).size > 1;
+      return queryMatch && (!general.differences || selected.length < 2 || differences) ? [{ label, cells }] : [];
+    });
+    const bankOptions = general.banks.map((id, index) => `<label for="compare-bank-${index}">Банк ${index + 1}
+      <select id="compare-bank-${index}" data-compare-bank="${index}">
+        <option value="">Выберите банк</option>${[...byId].map(([key, item]) =>
+          `<option value="${esc(key)}"${id === key ? ' selected' : general.banks.includes(key) ? ' disabled' : ''}>${esc(item.n)}</option>`
+        ).join('')}</select></label>`).join('');
+    const conditionOptions = [...labels].map(([id, label]) =>
+      `<option value="${esc(id)}"${general.condition === id ? ' selected' : ''}>${esc(label.replace(/\s+/g, ' '))}</option>`).join('');
+    const cell = (entry, label) => {
+      const [, text, note] = entry ?? [];
+      return (text && !isEmpty(text) ? generalValue(text) : '<span class="compare-missing">Не указано</span>') + cellNote(note, label);
+    };
+    const head = selected.map(item => `<th scope="col">${bankLabel(item.n, item.b[0])}</th>`).join('');
+    const tableRows = rows.map(({ label, cells }) => `<tr><th scope="row">${richText(label)}</th>
+      ${cells.map(entry => `<td>${cell(entry, label)}</td>`).join('')}</tr>`).join('');
+    const compact = rows.map(({ label, cells }) => `<article class="card"><h3>${richText(label)}</h3><dl>
+      ${cells.map((entry, index) => `<div><dt>${bankLabel(selected[index].n, selected[index].b[0])}</dt><dd>${cell(entry, label)}</dd></div>`).join('')}
+      </dl></article>`).join('');
+    const comparison = selected.length && rows.length
+      ? `<div class="tw loyalty-table compare-table" tabindex="0" role="region" aria-label="Сравнение общих условий банков">
+          <table><thead><tr><th scope="col">Условие</th>${head}</tr></thead><tbody>${tableRows}</tbody></table></div>
+        <div class="loyalty-rows compare-rows">${compact}</div>`
+      : `<p class="empty">${!selected.length ? 'Выберите банки для сравнения.' : 'Нет условий, подходящих под выбранные фильтры.'}</p>`;
+    return `<div class="general-compare"><div class="compare-banks">${bankOptions}</div>
+      <div class="compare-options"><label for="compare-condition">Условие<select id="compare-condition">
+        <option value="">Все условия</option>${conditionOptions}</select></label>
+        <label class="compare-differences"><input id="compare-differences" type="checkbox"
+          ${general.differences ? 'checked' : ''} ${selected.length < 2 ? 'disabled' : ''}> Только различия</label></div>
+      ${comparison}</div>`;
+  }
+
+  function generalConditions(section, result) {
+    const tabs = [['list', 'По банкам'], ['compare', 'Сравнить банки']].map(([id, label]) =>
+      `<button type="button" id="general-${id}" data-general-view="${id}" aria-pressed="${general.view === id}">${label}</button>`).join('');
+    const content = general.view === 'compare' ? generalComparison(section) : result.items.length
+      ? `<div class="cards">${result.items.map(item => card(item, { renderValue: generalValue })).join('')}</div>`
+      : '<p class="empty">Попробуйте изменить поиск или фильтр по банкам.</p>';
+    return `<div class="general-views" role="group" aria-label="Вид общих условий">${tabs}</div>${content}`;
   }
 
   function trancheView(section, result) {
@@ -817,7 +911,8 @@ function initMemo({ secs, groups, banks }) {
       return `<option value="${esc(item.id)}"${item.id === section.id ? ' selected' : ''}>${esc(item.t)}</option>`;
     }
     let contents = '';
-    if (section.id === 's9') contents = standardSubsidyView(section, result);
+    if (section.id === 's0') contents = generalConditions(section, result);
+    else if (section.id === 's9') contents = standardSubsidyView(section, result);
     else if (familySubsidy(section)) contents = groupedFamilySubsidyView(result);
     else if (section.id === 's3' && result.choices && result.count) contents = familyConditionsView(result);
     else if (section.id === 's7' && result.items.length) contents = trancheView(section, result);
@@ -911,7 +1006,23 @@ function initMemo({ secs, groups, banks }) {
       bankFilter.focus();
     }
   });
+  app.addEventListener('click', event => {
+    const button = event.target.closest('[data-general-view]');
+    if (!button) return;
+    general.view = button.dataset.generalView;
+    render();
+    document.getElementById(button.id).focus({ preventScroll: true });
+  });
   app.addEventListener('change', event => {
+    const { id, value, checked, dataset } = event.target;
+    if (dataset.compareBank !== undefined || id === 'compare-condition' || id === 'compare-differences') {
+      if (dataset.compareBank !== undefined) general.banks[Number(dataset.compareBank)] = value;
+      else if (id === 'compare-condition') general.condition = value;
+      else general.differences = checked;
+      render();
+      document.getElementById(id)?.focus({ preventScroll: true });
+      return;
+    }
     if (event.target.id === 'memo-sections') location.hash = event.target.value;
     const field = event.target.dataset.familyChoice;
     if (field === 'region' || field === 'children') {
