@@ -214,6 +214,12 @@ body:has(.memo-return) .compare-table tbody th { position: static; color: var(--
 .answer-no { background: #ffe4e7; color: #9e2637 }
 :root[data-theme="dark"] .answer-yes { background: #194335; color: #c3f3d8 }
 :root[data-theme="dark"] .answer-no { background: #632b38; color: #ffd6dc }
+.pill.issuance-free { background: #dcf6e7; color: #075934 }
+.pill.issuance-subsidy { background: #dcf2ff; color: #07567b }
+.pill.issuance-both { background: #eee3ff; color: #582b93 }
+:root[data-theme="dark"] .pill.issuance-free { background: #194335; color: #c3f3d8 }
+:root[data-theme="dark"] .pill.issuance-subsidy { background: #173d55; color: #b9e7ff }
+:root[data-theme="dark"] .pill.issuance-both { background: #483164; color: #ead7ff }
 @media (max-width: 580px) {
   body:has(.family-conditions) .brand { display: none }
   body:has(.family-conditions) .memo-pagehead :is(h1, p) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%) }
@@ -285,6 +291,11 @@ function initMemo({ secs, groups, banks }) {
   const comparisons = new Map(['s0', 's1', 's2', 's4', 's5', 's6', 's8'].map(id =>
     [id, { view: 'list', banks: ['', '', ''], filterKey: null, group: '', condition: '', differences: false }]));
   const bankNames = new Map(banks.map(bank => [bank.id, bank.n]));
+  const issuancePills = new Map([
+    ['бесплатный', 'issuance-free'],
+    ['субсидия', 'issuance-subsidy'],
+    ['субсидия и бесплатно', 'issuance-both'],
+  ]);
   const sheetIds = {
     s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
     s5: 1123676935, s6: 1297562849, s7: 860172231, s8: 558231179, s9: 2109045961,
@@ -404,8 +415,10 @@ function initMemo({ secs, groups, banks }) {
   }
 
   function value(text) {
-    const label = normal(text).trim();
-    if (['да', 'бесплатный', 'субсидия'].includes(label)) return `<span class="pill">${richText(text)}</span>`;
+    const label = normal(text).trim().replace(/\s+/g, ' ');
+    const issuance = issuancePills.get(label);
+    if (issuance) return `<span class="pill ${issuance}">${richText(text)}</span>`;
+    if (label === 'да') return `<span class="pill">${richText(text)}</span>`;
     if (['нет', '-', '—'].includes(label)) return `<span class="pill n">${richText(text)}</span>`;
     if (['стоп', 'стоп!'].includes(label)) return `<span class="pill s">${richText(text)}</span>`;
     return richText(text);
