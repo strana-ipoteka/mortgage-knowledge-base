@@ -159,6 +159,24 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .family-offers dt { color: var(--tx); font-weight: 600; text-transform: none }
 .family-offers .bank-logo { width: 17px; height: 17px; vertical-align: -.21rem; margin-inline-end: 4px }
 .family-offers dd { margin: 3px 0 0; font-weight: 700 }
+.tranche-card { margin-bottom: 16px; overflow: hidden; border: 1px solid var(--ln); border-radius: 16px; background: var(--sf) }
+.tranche-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px; background: var(--bl); border-bottom: 1px solid var(--ln) }
+.tranche-header h3, .tranche-body h4 { margin: 0; color: var(--tx); overflow-wrap: anywhere }
+.tranche-header h3 { font-size: 19px }
+.tranche-header p { margin: 4px 0 0; color: var(--mu) }
+.tranche-calculator { display: inline-block; padding: 8px 12px; border-radius: 9px; background: var(--sf); color: var(--bb); font-weight: 600 }
+.tranche-body { display: grid; gap: 16px; padding: 16px }
+.tranche-metrics, .tranche-rates { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)) }
+.tranche-metrics > div, .tranche-rates > div { padding: 10px; border: 1px solid var(--ln); border-radius: 9px; background: var(--bg); overflow-wrap: anywhere }
+.tranche-metrics dd, .tranche-rates dd { margin: 4px 0 0; font-size: 19px; font-weight: 700 }
+.tranche-metrics small { display: block; margin-top: 2px; color: var(--mu) }
+.tranche-rates { margin-top: 8px }
+.tranche-rates dd { color: var(--bb) }
+.tranche-details details { padding: 9px 0; border-top: 1px solid var(--ln) }
+.tranche-details summary { cursor: pointer; font-weight: 600 }
+.tranche-details details > div { margin-top: 6px; overflow-wrap: anywhere }
+.tranche-details ul { margin: 0; padding-inline-start: 20px }
+.tranche-details ul + ul { margin-top: 10px }
 .memo-tools :focus-visible, .memo-results :focus-visible, .memo-catalog :focus-visible, .memo-section :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 @media (max-width: 580px) {
   .memo-tools { padding: 12px }
@@ -278,6 +296,8 @@ function initMemo({ secs, groups, banks }) {
       return result;
     }
     if (section.kind === 'cards') {
+      const shared = section.id === 's7' ? section.items.filter(item => item.t === 'note')
+        .flatMap(item => [item.x, item.note]).join(' ') : '';
       result.items = section.items.flatMap(item => {
         if (item.t === 'note') {
           const show = terms.length ? matches([sectionText, item.x, item.note].join(' ')) : !inSearch;
@@ -289,7 +309,7 @@ function initMemo({ secs, groups, banks }) {
         const text = byBank && item.kb
           ? [item.n, item.g, ...entries.flat(), ...item.more.flat(2)].join(' ')
           : `${item.s} ${item.n} ${item.b.map(bank => bankNames.get(bank)).join(' ')}`;
-        return matches([sectionText, text, item.note].join(' ')) ? [{ ...item, kv: entries }] : [];
+        return matches([sectionText, text, item.note, shared].join(' ')) ? [{ ...item, kv: entries }] : [];
       });
       result.count = result.items.filter(item => terms.length || item.t !== 'note').length;
       return result;
@@ -369,6 +389,57 @@ function initMemo({ secs, groups, banks }) {
       ${fields(item.kv.slice(0, limit), Boolean(item.kb))}
       ${extraFields ? `<details class="memo-card-details"><summary>Все условия</summary>${extraFields}${more}</details>` : more}
       </article>`;
+  }
+
+  function trancheView(section, result) {
+    const notes = section.items.filter(item => item.t === 'note');
+    const firstTranche = notes.find(item => /^первый транш\s*\(/i.test(item.x));
+    const firstMatch = firstTranche?.x.match(/^первый транш\s*\(\s*минимальный\s+с\s+([^()]+)\)\s+(.+)$/i);
+    const otherNotes = notes.filter(item => !firstMatch || item !== firstTranche).map(card).join('');
+    const banks = result.items.filter(item => item.t === 'card').map(item => {
+      const entry = label => item.kv.find(field => field[0] === label) ?? [];
+      const [, program, programNote] = entry('Программа');
+      const [, loan, loanNote] = entry('Сумма');
+      const [, calculator, calculatorNote] = entry('Калькулятор');
+      const [, comment, commentNote] = entry('Комментарий');
+      const [, payment, paymentNote] = entry('Досрочное гашение');
+      const known = new Set(['Программа', 'Сумма', 'ПВ', 'Ставка', 'Калькулятор', 'Комментарий', 'Досрочное гашение']);
+      const rateRows = [item.kv, ...item.more].flatMap(block => {
+        const [, down, downNote] = block.find(field => field[0] === 'ПВ') ?? [];
+        const [, rate, rateNote] = block.find(field => field[0] === 'Ставка') ?? [];
+        return down || rate ? [`<div><dt>ПВ ${richText(down)}</dt><dd>${richText(rate || '—')}
+          ${cellNote(downNote, 'ПВ')}${cellNote(rateNote, 'Ставка')}</dd></div>`] : [];
+      }).join('');
+      const discounts = (comment ?? '').split(/\n\s*\n/).filter(Boolean).map(block =>
+        `<ul>${block.split('\n').filter(line => line.trim()).map(line => `<li>${richText(line.trim())}</li>`).join('')}</ul>`).join('');
+      const metrics = [
+        firstMatch ? `<div><dt>Минимальный первый транш</dt><dd>${richText(firstMatch[2].replace(/\s*р\.?$/i, ' ₽'))}</dd>
+          <small>с ${richText(firstMatch[1].replace(/\s*г\.?$/i, ''))}</small>${cellNote(firstTranche.note, 'Первый транш')}</div>` : '',
+        loan ? `<div><dt>Сумма кредита</dt><dd>${richText(loan.replace(/млн\.руб\.?$/i, 'млн ₽'))}
+          ${cellNote(loanNote, 'Сумма кредита')}</dd></div>` : '',
+      ].join('');
+      const extra = [...item.kv.filter(field => !known.has(field[0])),
+        ...item.more.flat().filter(([label]) => label !== 'ПВ' && label !== 'Ставка')];
+      const link = /^https?:\/\/\S+$/i.test(calculator ?? '')
+        ? `<a class="tranche-calculator" href="${esc(calculator)}" target="_blank" rel="noopener noreferrer">Открыть калькулятор</a>`
+        : richText(calculator);
+      return `<article class="tranche-card"><div class="tranche-header">
+        <div><h3>${bankLabel(item.n, item.b[0])}</h3>${program ? `<p>${richText(program.replace(/-/g, ' · '))}</p>` : ''}
+          ${cellNote(programNote, 'Программа')}${cellNote(item.note, item.n)}</div>
+        <div>${link}${cellNote(calculatorNote, 'Калькулятор')}</div></div>
+        <div class="tranche-body">
+          ${metrics ? `<dl class="tranche-metrics">${metrics}</dl>` : ''}
+          ${rateRows ? `<section><h4>Ставки по первоначальному взносу</h4><dl class="tranche-rates">${rateRows}</dl></section>` : ''}
+          ${extra.length ? fields(extra) : ''}
+          <div class="tranche-details">
+            ${discounts ? `<details${terms.length ? ' open' : ''}><summary>Дисконты и ограничения</summary><div>
+              ${discounts}${cellNote(commentNote, 'Комментарий')}</div></details>` : ''}
+            ${payment ? `<details${terms.length ? ' open' : ''}><summary>Досрочное погашение</summary>
+              <div>${richText(payment)}${cellNote(paymentNote, 'Досрочное погашение')}</div></details>` : ''}
+          </div>
+        </div></article>`;
+    }).join('');
+    return banks ? banks + otherNotes : result.items.map(card).join('');
   }
 
   function subsidyBankName(section, index) {
@@ -647,6 +718,7 @@ function initMemo({ secs, groups, banks }) {
     let contents = '';
     if (section.id === 's9') contents = standardSubsidyView(section, result);
     else if (familySubsidy(section)) contents = groupedFamilySubsidyView(result);
+    else if (section.id === 's7' && result.items.length) contents = trancheView(section, result);
     else if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
     else if (section.kind === 'cards' && result.items.length) contents = `<div class="cards">${result.items.map(card).join('')}</div>`;
     else if (result.rows.length) contents = table(section, result);
