@@ -34,18 +34,23 @@
 :root[data-theme="dark"] .client-notes h3{color:#f0b7dd}
 :root[data-theme="dark"] .client-notes p{color:#f0e5ef}
 :root[data-theme="dark"] .client-notes p+p{border-top-color:#64445d}
+.download-guide h4{margin:16px 0 6px;font-size:15px}
+.download-guide ol{margin:0;padding-inline-start:1.5em}
+.download-guide li+li{margin-top:5px}
+.download-guide a{color:var(--accent);text-decoration:underline}
 :root[data-theme="dark"] .doc:before{color:#e389c6}
 :root[data-theme="dark"] .progressline{background:#47404b}
 @media(max-width:560px){.headtools{gap:6px}.wordmark{font-size:10px}#theme{padding:9px;font-size:12px}}
 @media print{:root[data-theme="dark"] body{background:white!important;color:#161616!important}:root[data-theme="dark"] .summary,:root[data-theme="dark"] .summaryheader,:root[data-theme="dark"] .summarybody,:root[data-theme="dark"] .section{background:white!important;color:#161616!important}:root[data-theme="dark"] .chip{background:#eee!important;color:#222!important}:root[data-theme="dark"] .client-notes{background:#fff6fc!important;color:#222!important}:root[data-theme="dark"] .client-notes h3,:root[data-theme="dark"] .client-notes p{color:#222!important}}
 </style>
 <link rel="stylesheet" href="./site-consistency.css?v=1"><link rel="stylesheet" href="./uoii-reference-style.css?v=2"></head><body><header><div class="headinner"><a class="back" href="./#home" data-site-back aria-label="Вернуться назад">← Назад</a><div class="headtools"><span class="wordmark">Отдел ипотеки</span><div class="sw" role="group" aria-label="Тема оформления"><button type="button" data-t="light" aria-pressed="true">Светлая</button><button type="button" data-t="dark" aria-pressed="false">Тёмная</button></div></div></div></header><div class="stripe" aria-hidden="true"></div><main class="page"><div class="pagehead"><div><div class="eyebrow">Инструменты менеджера</div><h1>Документы на ипотеку</h1><p>Ответьте на вопросы — получите готовый список для клиента.</p></div><div class="softmark">▤</div></div><div class="layout"><aside class="sidebar"><h3>Подбор документов</h3><div class="steps" id="steps"></div><div class="sidetip">Перечень составляется по актуальной рабочей таблице отдела. Данные клиента на сайте не сохраняются.</div></aside><div><section class="panel" id="questionnaire"><div class="progressline"><span id="progress"></span></div><div id="questions"></div></section><section class="summary hidden" id="result"></section></div></div></main>
-<script src="./documents-data.js?v=no-military-20261119"></script>
+<script src="./documents-data.js?v=20261127-1"></script>
 <script>
 
 const D=window.DOCUMENT_RULES;
 const state={program:"family",marital:"single",citizenship:"rf",spouse:"no",spouseCitizenship:"rf",job:"official",spouseIncome:"no",spouseJob:"official",capital:"no",ip:"usn",idx:0,done:new Set()};
 const $=s=>document.querySelector(s);
+const guideHeading="Как выгрузить документы из Госуслуг";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const labels={family:"Семейная ипотека",it:"IT-ипотека",standard:"Стандартная ипотека",official:"По найму · официальный доход",partial:"По найму · доход частично неофициальный",company:"ООО",ip_usn:"ИП · УСН",ip_patent:"ИП · патент",self:"Самозанятый"};
 function qs(){
@@ -76,7 +81,7 @@ function showStep(){
  $('#prev').onclick=()=>{if(state.idx>0){state.idx--;showStep()}};
  $('#next').onclick=()=>{if(state.idx===qs().length-1)showResult();else{state.idx++;showStep()}};
 }
-function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Инструкция: как выгрузить документы из Госуслуг:|\n\s*Имейте в виду, что в дальнейшем для сделки потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
+function splitSource(raw){const text=String(raw||"").trim(),cut=text.search(/\n\s*Имейте в виду, что в дальнейшем для сделки потребуется:|\n\s*Примечание:/i);return cut>=0?{list:text.slice(0,cut).trim(),more:text.slice(cut).trim()}:{list:text,more:""}}
 function lines(raw){return raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^[-•]\s*/,"").trim()).map(x=>x.replace(/^([а-яё])/u,(_,letter)=>letter.toLocaleUpperCase("ru-RU")))}
 function docGroups(){
  const p=D.programs[state.program];let personal="";
@@ -107,16 +112,41 @@ function docGroups(){
    });
  }
  const familySpouseNote=state.program==="family"&&state.marital==="married"?"С 01.02.2026 оба супруга обязаны участвовать в кредитном договоре по семейной ипотеке. Исключение — супруг(а), являющийся нерезидентом.":"";
- return {groups,notes:[familySpouseNote,a.more,b.more,spouseWork?.more].filter(Boolean).filter((note,i,all)=>all.indexOf(note)===i)};
+ const requestedDocs=groups.flatMap(group=>group.docs);
+ const guides=D.downloadGuides.filter(guide=>requestedDocs.some(doc=>doc.startsWith(guide.document)));
+ return {groups,guides,notes:[familySpouseNote,a.more,b.more,spouseWork?.more].filter(Boolean).filter((note,i,all)=>all.indexOf(note)===i)};
 }
 let current=null;
-function copyList(){let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";for(const g of current.groups){if(g.docs.length)result+=g.title+":\n"+g.docs.map(x=>"• "+x).join("\n")+"\n\n"}if(current.notes.length)result+="ВАЖНО ДЛЯ КЛИЕНТА — ДОПОЛНИТЕЛЬНЫЕ УСЛОВИЯ И ИНСТРУКЦИИ\n"+current.notes.join("\n\n")+"\n";return result.trim()}
+function guideStep({text,link},html=false){
+ const intro=html?esc(text):text;
+ if(!link)return intro;
+ const reference=html
+   ? `<a href="${esc(link.url)}" target="_blank" rel="noopener noreferrer">${esc(link.label)}</a>`
+   : `${link.label} (${link.url})`;
+ return `${intro} ${reference}.`;
+}
+function copyList(){
+ let result="Документы для подачи заявки на ипотеку\n"+labels[state.program]+"\n\n";
+ for(const g of current.groups){if(g.docs.length)result+=g.title+":\n"+g.docs.map(x=>"• "+x).join("\n")+"\n\n"}
+ if(current.guides.length){
+   const instructions=current.guides.map(guide=>guide.title+"\n"+
+     guide.steps.map((step,index)=>`${index+1}. ${guideStep(step)}`).join("\n"));
+   result+=guideHeading+"\n\n"+instructions.join("\n\n")+"\n\n";
+ }
+ if(current.notes.length)result+="ВАЖНО ДЛЯ КЛИЕНТА — ДОПОЛНИТЕЛЬНЫЕ УСЛОВИЯ И ИНСТРУКЦИИ\n"+current.notes.join("\n\n")+"\n\n";
+ return result.trim();
+}
 function toast(msg){const div=document.createElement('div');div.className="toast";div.textContent=msg;document.body.append(div);setTimeout(()=>div.remove(),2200)}
 function copy(t){const fallback=()=>{const a=document.createElement("textarea");a.value=t;document.body.append(a);a.select();document.execCommand("copy");a.remove();toast("Список скопирован")};navigator.clipboard?.writeText?navigator.clipboard.writeText(t).then(()=>toast("Список скопирован"),fallback):fallback()}
 function showResult(){
  current=docGroups();$('#questionnaire').classList.add('hidden');$('#result').classList.remove('hidden');$('#steps').innerHTML='<div class="navstep past"><span class="dot">✓</span><span>Ответы получены</span></div><div class="navstep current"><span class="dot">✓</span><span>Список документов</span></div>';
  let html='<div class="summaryheader"><div class="eyebrow">Готово к отправке клиенту</div><h2>Список документов</h2><div class="chips"><span class="chip">'+esc(labels[state.program])+'</span><span class="chip">'+esc(state.marital==="married"?"В браке":"Не состоит в браке")+'</span><span class="chip">'+esc(labels[state.job])+'</span></div></div><div class="summarybody"><p class="resultnote">Список сформирован для отправки клиенту с учётом ответов на вопросы.</p><div class="resultactions"><button type="button" class="btn" id="copy">⧉ Скопировать для клиента</button><button type="button" class="btn secondary" id="pdf">↓ Сохранить PDF</button><button type="button" class="btn outline" id="edit">← Назад к вопросам</button></div>';
  current.groups.forEach(g=>{html+='<div class="section"><h3>'+esc(g.title)+'</h3>'+(g.docs.length?g.docs.map(d=>'<div class="doc"><span>'+esc(d)+'</span></div>').join(''):'<p class="resultnote">Перечень не указан в исходной таблице.</p>')+'</div>'});
+ if(current.guides.length){
+   const guides=current.guides.map(guide=>`<div><h4>${esc(guide.title)}</h4>
+     <ol>${guide.steps.map(step=>`<li>${guideStep(step,true)}</li>`).join('')}</ol></div>`).join('');
+   html+=`<section class="client-notes download-guide"><h3>${guideHeading}</h3>${guides}</section>`;
+ }
  if(current.notes.length)html+='<section class="client-notes"><h3>Важно для клиента · Дополнительные условия и инструкции</h3>'+current.notes.map(s=>'<p>'+esc(s)+'</p>').join('')+'</section>';
  html+='<p class="footerhint">Перечень составлен по рабочей Google Таблице. Для нестандартных ситуаций необходимо подтвердить требования у ипотечного брокера. <a href="'+esc(D.source)+'" target="_blank" rel="noopener">Посмотреть источник ↗</a></p></div>';
  $('#result').innerHTML=html;
