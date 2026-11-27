@@ -143,6 +143,14 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .loyalty-table :is(th, td) { min-width: 0; max-width: none; padding: 8px; overflow-wrap: anywhere }
 .loyalty-table :is(th, td):first-child { width: 12% }
 .loyalty-rows { display: none }
+.standard-rate > summary { min-height: 30px; line-height: 30px }
+.standard-rate > summary small { margin-inline-start: 10px }
+.standard-term { margin-top: 12px }
+.standard-rate .loyalty-table :is(th, td):first-child { width: 28% }
+.standard-rate .loyalty-table :is(th, td):nth-child(2) { width: 46% }
+.standard-rate .loyalty-table td:last-child { font-weight: 600 }
+.standard-row h4 { margin: 0 0 7px; font-size: 15px }
+.standard-row .memo-cell-note { margin-bottom: 6px }
 @media (max-width: 759px) {
   .loyalty-table { display: none }
   .loyalty-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 8px; margin-top: 12px }
@@ -274,6 +282,7 @@ function initMemo({ secs, groups, banks }) {
     if (inSearch && filterUnavailable) return result;
 
     const sectionText = [section.t, section.d, ...(section.notes ?? []).flat()].join(' ');
+    if (section.id === 's9') return standardSubsidy(section, sectionText);
     if (section.kind === 'loyalty') {
       result.info = section.info.filter(item => matches([sectionText, item.title, item.text].join(' ')));
       result.programs = section.programs.map(program => {
@@ -384,6 +393,89 @@ function initMemo({ secs, groups, banks }) {
 
   function subsidyBankName(section, index) {
     return section.head[index].replace(/^КВ · /, '');
+  }
+
+  function standardSubsidy(section, sectionText) {
+    const bankColumns = new Map();
+    section.bc.forEach((ids, index) => {
+      if (index < section.lab) return;
+      const fee = /^КВ\s*·/i.test(section.head[index]);
+      for (const id of ids) {
+        if (state.banks.size && !state.banks.has(id)) continue;
+        if (!bankColumns.has(id)) {
+          bankColumns.set(id, { id, name: bankNames.get(id) ?? subsidyBankName(section, index), down: [], fee: [] });
+        }
+        bankColumns.get(id)[fee ? 'fee' : 'down'].push(index);
+      }
+    });
+
+    const rates = new Map();
+    for (const row of section.rows) {
+      if (row.span || row.sub) continue;
+      const [rate, term] = row.c;
+      const offers = [...bankColumns.values()].filter(bank => {
+        const columns = [...bank.down, ...bank.fee];
+        return columns.some(index => !isEmpty(row.c[index]) || row.notes?.[index])
+          && matches([sectionText, rate, term, bank.name, 'Ставка Срок ПВ КВ',
+            row.notes?.[0], row.notes?.[1],
+            ...columns.flatMap(index => [section.head[index], section.headerNotes?.[index],
+              row.c[index], row.notes?.[index]])].join(' '));
+      }).map(bank => ({ bank, row }));
+      if (!offers.length) continue;
+
+      const percent = /^\s*(\d+(?:[.,]\d+)?)\s*%\s*$/.exec(rate)?.[1];
+      const number = percent === undefined ? Infinity : Number(percent.replace(',', '.'));
+      const key = Number.isFinite(number) ? number : rate;
+      if (!rates.has(key)) rates.set(key, { rate, number, terms: new Map() });
+      const rateGroup = rates.get(key);
+      if (!rateGroup.terms.has(term)) rateGroup.terms.set(term, []);
+      rateGroup.terms.get(term).push(...offers);
+    }
+    const subsidyGroups = [...rates.values()].sort((a, b) =>
+      a.number === b.number ? 0 : a.number - b.number);
+    const rows = section.rows.filter(row => row.span
+      && bankColumns.size && matches([sectionText, row.c[0], row.notes?.[0]].join(' ')));
+    const count = subsidyGroups.reduce((total, rate) =>
+      total + [...rate.terms.values()].reduce((sum, offers) => sum + offers.length, 0), 0)
+      + (terms.length ? rows.length : 0);
+    return { subsidyGroups, rows, count };
+  }
+
+  function standardSubsidyView(section, result) {
+    const notices = result.rows.map(row =>
+      `<div class="note h">${richText(row.c[0])}${cellNote(row.notes?.[0])}</div>`).join('');
+    const rates = result.subsidyGroups.map(({ rate, terms: durations }, index) => {
+      const termBlocks = [...durations].map(([term, offers]) => {
+        const cell = (row, columns, label) => columns.map(column => {
+          const sourceNote = cellNote(section.headerNotes?.[column], `${label} · общие условия банка`);
+          const note = cellNote(row.notes?.[column], label);
+          const text = row.c[column];
+          return text?.trim() || sourceNote || note
+            ? `<div>${richText(text || '—')}${note}${sourceNote}</div>` : '';
+        }).join('') || '—';
+        const commonNotes = [0, 1].map(column => [...new Set(offers.map(({ row }) => row.notes?.[column]))]
+          .map(note => cellNote(note, section.head[column])).join('')).join('');
+        const rows = offers.map(({ bank, row }) => [
+          bankLabel(bank.name, bank.id),
+          cell(row, bank.down, 'ПВ и условия'),
+          cell(row, bank.fee, 'КВ'),
+        ]);
+        const tableRows = rows.map(row => `<tr>${row.map(text => `<td>${text}</td>`).join('')}</tr>`).join('');
+        const mobileRows = rows.map(([bank, down, fee]) => `<article class="card standard-row">
+          <h4>${bank}</h4><dl><div><dt>ПВ и условия</dt><dd>${down}</dd></div>
+          <div><dt>КВ</dt><dd>${fee}</dd></div></dl></article>`).join('');
+        return `<section class="standard-term"><h3>Срок · ${richText(term || '—')}</h3>${commonNotes}
+          <div class="tw loyalty-table" tabindex="0" role="region" aria-label="${esc([rate, term].join(' · '))}">
+            <table><thead><tr><th scope="col">Банк</th><th scope="col">ПВ и условия</th><th scope="col">КВ</th></tr></thead>
+            <tbody>${tableRows}</tbody></table></div>
+          <div class="loyalty-rows">${mobileRows}</div></section>`;
+      }).join('');
+      const firstTerm = durations.keys().next().value;
+      const termLabel = durations.size === 1 && firstTerm ? `<small>${richText(firstTerm)}</small>` : '';
+      return `<details class="loyalty-program standard-rate"${index === 0 || terms.length ? ' open' : ''}>
+        <summary>${richText(rate || 'Ставка не указана')}${termLabel}</summary>${termBlocks}</details>`;
+    }).join('');
+    return notices + rates;
   }
 
   function loyaltyProgram(program) {
@@ -509,7 +601,8 @@ function initMemo({ secs, groups, banks }) {
       return `<option value="${esc(item.id)}"${item.id === section.id ? ' selected' : ''}>${esc(item.t)}</option>`;
     }
     let contents = '';
-    if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
+    if (section.id === 's9') contents = standardSubsidyView(section, result);
+    else if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
     else if (section.kind === 'cards' && result.items.length) contents = `<div class="cards">${result.items.map(card).join('')}</div>`;
     else if (result.rows.length) contents = table(section, result);
     return `<section class="memo-section">
