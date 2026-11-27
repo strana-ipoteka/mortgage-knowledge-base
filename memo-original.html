@@ -552,7 +552,7 @@ function initMemo({ secs, groups, banks }) {
     const limits = result.limits.map(({ bank, fee, note, headerNote }) =>
       `<div><dt>${bankLabel(bank.name, bank.id)}</dt>
         <dd>${richText(fee)}${cellNote(note, bank.name)}${cellNote(headerNote, bank.name)}</dd></div>`).join('');
-    const limitBlock = limits ? `<details class="loyalty-info"${terms.length ? ' open' : ''}>
+    const limitBlock = limits ? `<details class="loyalty-info" open>
       <summary>Максимальный срок по банкам</summary><dl class="loyalty-context">${limits}</dl></details>` : '';
     const byChildCount = [...result.children].sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10));
     const groups = byChildCount.map(([condition, group], groupIndex) => {
