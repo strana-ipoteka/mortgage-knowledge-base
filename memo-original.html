@@ -121,15 +121,6 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .memo-table-hint { color: var(--mu); margin: 0 0 8px; font-size: 14px }
 .tw { overflow: auto; max-height: min(75vh, 640px) }
 .tw td { overflow-wrap: anywhere }
-.subsidy-table table { width: 100%; table-layout: fixed }
-.subsidy-table :is(th, td) { min-width: 0; max-width: none; padding: 8px 6px; overflow-wrap: anywhere }
-.subsidy-table :is(th, td):first-child { width: 112px }
-.subsidy-table th:nth-child(2) { width: 64px }
-.subsidy-table th:nth-child(3) { width: 76px }
-.subsidy-table :is(th, td):nth-child(n + 2) { text-align: center }
-.subsidy-table th .bank-logo { display: block; margin: 0 auto 4px }
-.subsidy-table td .memo-cell-note { font-size: 13px }
-.subsidy-cards { display: none }
 .loyalty-program, .loyalty-info { margin: 0 0 12px; padding: 14px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
 .loyalty-program h3, .loyalty-program > summary, .loyalty-info > summary { margin: 0; font-size: 16px; font-weight: 700 }
 .loyalty-program > summary, .loyalty-info > summary { cursor: pointer }
@@ -157,25 +148,16 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
   .loyalty-rows .card { margin: 0; min-width: 0; padding: 10px }
   .loyalty-rows .card > .memo-cell-note { margin-bottom: 8px }
 }
-@media (max-width: 919px) {
-  .subsidy-table { display: none }
-  .subsidy-cards { display: grid; gap: 10px }
-  .subsidy-option { min-width: 0; padding: 12px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
-  .subsidy-option h3 { margin: 0 0 8px; font-size: 15px }
-  .subsidy-option > summary { min-height: 28px; cursor: pointer; font-weight: 700 }
-  .subsidy-option[open] > summary { margin-bottom: 8px }
-  .subsidy-option dl { display: grid; margin: 0; gap: 6px 10px }
-  .subsidy-terms { grid-template-columns: minmax(0, 1.5fr) minmax(0, .65fr) minmax(0, .85fr) }
-  .subsidy-option dt { color: var(--mu); font-size: 13px; line-height: 1.3 }
-  .subsidy-option dd { margin: 3px 0 0; font-weight: 600; overflow-wrap: anywhere }
-  .subsidy-option .subsidy-banks { grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.75rem), 1fr)) }
-  .subsidy-banks > div { min-width: 0; padding: 7px 8px; border-radius: 8px; background: var(--bg) }
-  .subsidy-banks dt { color: var(--tx); font-weight: 600; overflow-wrap: anywhere }
-  .subsidy-banks dd { margin-top: 5px }
-  .subsidy-option .subsidy-terms + h3 { margin-top: 12px }
-  .subsidy-option p { margin: 12px 0 0; color: var(--mu) }
-  .subsidy-cards .note { margin: 0 }
-}
+.family-subsidy > summary { line-height: 1.5; overflow-wrap: anywhere }
+.family-subsidy > summary small { margin-inline-start: 8px }
+.family-bank { margin-top: 8px; padding: 9px 12px; border: 1px solid var(--ln); border-radius: 9px; background: var(--bg) }
+.family-bank > summary { min-height: 28px; cursor: pointer; font-weight: 600 }
+.family-bank .loyalty-table { margin-top: 8px }
+.family-bank .loyalty-table :is(th, td):first-child { width: 26% }
+.family-bank .loyalty-table td:last-child { font-weight: 600 }
+.family-bank .loyalty-rows { margin-top: 8px }
+.family-bank .card dl { margin: 0; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr) minmax(0, 1.15fr) }
+.family-bank .card :is(dt, dd) { overflow-wrap: anywhere }
 .memo-tools :focus-visible, .memo-results :focus-visible, .memo-catalog :focus-visible, .memo-section :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 @media (max-width: 580px) {
   .memo-tools { padding: 12px }
@@ -283,6 +265,7 @@ function initMemo({ secs, groups, banks }) {
 
     const sectionText = [section.t, section.d, ...(section.notes ?? []).flat()].join(' ');
     if (section.id === 's9') return standardSubsidy(section, sectionText);
+    if (familySubsidy(section)) return groupedFamilySubsidy(section, sectionText);
     if (section.kind === 'loyalty') {
       result.info = section.info.filter(item => matches([sectionText, item.title, item.text].join(' ')));
       result.programs = section.programs.map(program => {
@@ -313,10 +296,6 @@ function initMemo({ secs, groups, banks }) {
 
     const width = section.head.length || Math.max(0, ...section.rows.map(row => row.c.length));
     result.columns = Array.from({ length: width }, (_, index) => index);
-    if (familySubsidy(section)) {
-      result.columns = result.columns.filter(index =>
-        index < section.lab || section.head[index].startsWith('КВ ·'));
-    }
     if (byBank && hasBankColumns) {
       result.columns = result.columns.filter(index =>
         index < section.lab || section.bc[index]?.some(bank => selected.has(bank)));
@@ -395,6 +374,11 @@ function initMemo({ secs, groups, banks }) {
     return section.head[index].replace(/^КВ · /, '');
   }
 
+  function rateNumber(rate) {
+    const percent = /^\s*(\d+(?:[.,]\d+)?)\s*%+\s*$/.exec(rate)?.[1];
+    return percent === undefined ? Infinity : Number(percent.replace(',', '.'));
+  }
+
   function standardSubsidy(section, sectionText) {
     const bankColumns = new Map();
     section.bc.forEach((ids, index) => {
@@ -423,8 +407,7 @@ function initMemo({ secs, groups, banks }) {
       }).map(bank => ({ bank, row }));
       if (!offers.length) continue;
 
-      const percent = /^\s*(\d+(?:[.,]\d+)?)\s*%\s*$/.exec(rate)?.[1];
-      const number = percent === undefined ? Infinity : Number(percent.replace(',', '.'));
+      const number = rateNumber(rate);
       const key = Number.isFinite(number) ? number : rate;
       if (!rates.has(key)) rates.set(key, { rate, number, terms: new Map() });
       const rateGroup = rates.get(key);
@@ -510,38 +493,92 @@ function initMemo({ secs, groups, banks }) {
     return info + result.programs.map(loyaltyProgram).join('');
   }
 
-  function subsidyCards(section, result) {
-    const bankColumns = result.columns.filter(index => index >= section.lab);
-    const rows = result.rows.map(row => {
-      if (row.span) return `<div class="note h">${richText(row.c[0])}${cellNote(row.notes?.[0])}</div>`;
-
-      const conditions = row.c.slice(0, section.lab);
-      const hasConditions = conditions.some(Boolean);
-      const conditionsHtml = hasConditions ? `<dl class="subsidy-terms">${conditions.map((text, index) =>
-        `<div><dt>${esc(section.head[index])}</dt><dd>${richText((text || '—').replaceAll('\n', ' '))}${cellNote(row.notes?.[index], section.head[index])}</dd></div>`
-      ).join('')}</dl>` : '';
-      const banks = bankColumns.filter(index => !isEmpty(row.c[index]) || row.notes?.[index]).map(index => {
-        const name = subsidyBankName(section, index);
-        const text = isEmpty(row.c[index]) ? '—' : row.c[index];
-        return `<div><dt>${bankLabel(name, section.bc[index]?.[0])}</dt><dd>${richText(text)}${cellNote(row.notes?.[index], name)}</dd></div>`;
-      }).join('');
-      if (!hasConditions) {
-        return `<details class="subsidy-option"${terms.length ? ' open' : ''}>
-          <summary>Максимальный срок по банкам</summary><dl class="subsidy-banks">${banks}</dl></details>`;
+  function groupedFamilySubsidy(section, sectionText) {
+    const bankColumns = section.head.flatMap((label, column) => {
+      if (!/^КВ\s*·/i.test(label)) return [];
+      return section.bc[column].filter(id => !state.banks.size || state.banks.has(id))
+        .map(id => ({ id, column, name: bankNames.get(id) ?? subsidyBankName(section, column) }));
+    });
+    const children = new Map();
+    const limits = [];
+    let count = 0;
+    for (const row of section.rows) {
+      if (row.span || row.sub) continue;
+      const [condition, rate, term] = row.c;
+      for (const bank of bankColumns) {
+        const fee = row.c[bank.column];
+        const note = row.notes?.[bank.column];
+        const headerNote = section.headerNotes?.[bank.column];
+        if (isEmpty(fee) && !note) continue;
+        if (!matches([sectionText, condition, childCountLabel(condition.split('\n')[0]), rate, term, bank.name, section.head[bank.column], fee,
+          row.notes?.[0], row.notes?.[1], row.notes?.[2],
+          note, headerNote].join(' '))) continue;
+        if (!condition && !rate && !term) {
+          limits.push({ bank, fee, note, headerNote });
+          continue;
+        }
+        if (!children.has(condition)) children.set(condition, { banks: new Map(), notes: new Set() });
+        const group = children.get(condition);
+        if (row.notes?.[0]) group.notes.add(row.notes[0]);
+        if (!group.banks.has(bank.id)) group.banks.set(bank.id, { ...bank, offers: [], notes: new Set() });
+        const entry = group.banks.get(bank.id);
+        if (headerNote) entry.notes.add(headerNote);
+        entry.offers.push([['Ставка', rate, row.notes?.[1]], ['Срок', term, row.notes?.[2]], ['КВ', fee, note]]);
+        count++;
       }
-      return `<article class="subsidy-option">${conditionsHtml}${banks
-        ? `<h3>КВ по банкам</h3><dl class="subsidy-banks">${banks}</dl>`
-        : '<p>КВ не указано</p>'}</article>`;
+    }
+    const rows = section.rows.filter(row => row.span && bankColumns.length
+      && matches([sectionText, row.c[0], row.notes?.[0]].join(' ')));
+    if (terms.length) count += limits.length + rows.length;
+    return { children, limits, rows, count };
+  }
+
+  function childCountLabel(number) {
+    if (!/^\d+$/.test(number)) return number || 'Количество детей не указано';
+    const n = Number(number);
+    return `${number} ${n === 1 ? 'ребёнок' : n >= 2 && n <= 4 ? 'ребёнка' : 'детей'}`;
+  }
+
+  function groupedFamilySubsidyView(result) {
+    const notices = result.rows.map(row =>
+      `<div class="note h">${richText(row.c[0])}${cellNote(row.notes?.[0])}</div>`).join('');
+    const limits = result.limits.map(({ bank, fee, note, headerNote }) =>
+      `<div><dt>${bankLabel(bank.name, bank.id)}</dt>
+        <dd>${richText(fee)}${cellNote(note, bank.name)}${cellNote(headerNote, bank.name)}</dd></div>`).join('');
+    const limitBlock = limits ? `<details class="loyalty-info"${terms.length ? ' open' : ''}>
+      <summary>Максимальный срок по банкам</summary><dl class="loyalty-context">${limits}</dl></details>` : '';
+    const byChildCount = [...result.children].sort(([a], [b]) => parseInt(a, 10) - parseInt(b, 10));
+    const groups = byChildCount.map(([condition, group], groupIndex) => {
+      const [number, ...details] = condition.split('\n');
+      const title = childCountLabel(number);
+      const subtitle = details.filter(Boolean).join(' ').replace(/-\s+/g, '-');
+      const bankOrder = [...group.banks.values()].sort((a, b) => a.column - b.column);
+      const banks = bankOrder.map(({ id, name, offers, notes }, bankIndex) => {
+        offers.sort((a, b) => rateNumber(a[0][1]) - rateNumber(b[0][1]));
+        const tableRows = offers.map(offer => `<tr>${offer.map(([label, text, note]) =>
+          `<td>${richText(text || '—')}${cellNote(note, label)}</td>`).join('')}</tr>`).join('');
+        const cards = offers.map(offer => `<article class="card">${fields(offer.map(([label, text, note]) =>
+          [label, text || '—', note]))}</article>`).join('');
+        const open = terms.length || groupIndex === 0 && bankIndex === 0;
+        return `<details class="family-bank"${open ? ' open' : ''}><summary>${bankLabel(name, id)}</summary>
+          ${[...notes].map(note => cellNote(note, name)).join('')}
+          <div class="tw loyalty-table" tabindex="0" role="region" aria-label="${esc(name)}">
+            <table><thead><tr><th scope="col">Ставка</th><th scope="col">Срок</th><th scope="col">КВ</th></tr></thead>
+            <tbody>${tableRows}</tbody></table></div>
+          <div class="loyalty-rows">${cards}</div></details>`;
+      }).join('');
+      return `<details class="loyalty-program family-subsidy"${groupIndex === 0 || terms.length ? ' open' : ''}>
+        <summary>${richText(title)}${subtitle ? `<small>${richText(subtitle)}</small>` : ''}</summary>
+        ${[...group.notes].map(note => cellNote(note, 'Количество детей')).join('')}${banks}</details>`;
     }).join('');
-    return `<div class="subsidy-cards">${rows}</div>`;
+    return notices + limitBlock + groups;
   }
 
   function table(section, result) {
-    const compact = familySubsidy(section);
     const columns = result.columns;
     const head = section.head.length
       ? `<thead><tr>${columns.map(index => {
-        const label = compact ? subsidyBankName(section, index) : section.head[index];
+        const label = section.head[index];
         return `<th scope="col">${bankLabel(label, section.bc?.[index]?.[0])}${cellNote(section.headerNotes?.[index], label)}</th>`;
       }).join('')}</tr></thead>`
       : '';
@@ -552,12 +589,11 @@ function initMemo({ secs, groups, banks }) {
       return `<tr${row.sub ? ' class="sub"' : ''}>${columns.map(index => {
         const cell = row.c[index];
         const content = normal(section.head[index]) === 'банк' ? bankLabel(cell) : richText(cell);
-        return `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${content}${cellNote(row.notes?.[index], section.head[index], compact ? 'Прим.' : 'Примечание')}</td>`;
+        return `<td${cell && isEmpty(cell) ? ' class="x"' : ''}>${content}${cellNote(row.notes?.[index], section.head[index])}</td>`;
       }).join('')}</tr>`;
     }).join('');
-    return `${compact ? '' : '<p class="memo-table-hint">Прокрутите таблицу, чтобы увидеть остальные столбцы.</p>'}
-      <div class="tw${compact ? ' subsidy-table' : ''}" tabindex="0" role="region" aria-label="${esc(section.t)}"><table>${head}<tbody>${rows}</tbody></table></div>
-      ${compact ? subsidyCards(section, result) : ''}`;
+    return `<p class="memo-table-hint">Прокрутите таблицу, чтобы увидеть остальные столбцы.</p>
+      <div class="tw" tabindex="0" role="region" aria-label="${esc(section.t)}"><table>${head}<tbody>${rows}</tbody></table></div>`;
   }
 
   function entry(section, subtitle) {
@@ -602,6 +638,7 @@ function initMemo({ secs, groups, banks }) {
     }
     let contents = '';
     if (section.id === 's9') contents = standardSubsidyView(section, result);
+    else if (familySubsidy(section)) contents = groupedFamilySubsidyView(result);
     else if (section.kind === 'loyalty' && result.programs) contents = loyalty(result);
     else if (section.kind === 'cards' && result.items.length) contents = `<div class="cards">${result.items.map(card).join('')}</div>`;
     else if (result.rows.length) contents = table(section, result);
