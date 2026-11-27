@@ -199,6 +199,7 @@ body:has(.memo-return) .memo-pagehead p { margin-bottom: 10px }
 .general-compare { padding: 12px; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf) }
 .compare-banks, .compare-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 8px }
 .compare-options { margin-top: 10px; align-items: end }
+.compare-object { margin-bottom: 10px }
 .general-compare label { font-size: 14px }
 .general-compare select { display: block; width: 100%; min-width: 0; min-height: 40px; margin-top: 4px; padding: 0 8px; border: 1px solid var(--ln); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit }
 .compare-differences { display: flex; gap: 6px; align-items: center; min-height: 40px }
@@ -281,7 +282,8 @@ if (!data) {
 
 function initMemo({ secs, groups, banks }) {
   const state = { query: '', banks: new Set(), family: { region: '', children: '', query: '' } };
-  const general = { view: 'list', banks: ['', '', ''], filterKey: null, condition: '', differences: false };
+  const comparisons = new Map(['s0', 's1', 's2', 's4', 's5', 's6', 's8'].map(id =>
+    [id, { view: 'list', banks: ['', '', ''], filterKey: null, group: '', condition: '', differences: false }]));
   const bankNames = new Map(banks.map(bank => [bank.id, bank.n]));
   const sheetIds = {
     s0: 0, s1: 1580280998, s2: 330286105, s3: 292621505, s4: 2143169685,
@@ -449,11 +451,19 @@ function initMemo({ secs, groups, banks }) {
     return `<span class="answer-word answer-${yes ? 'yes' : 'no'}">${richText(yes ? 'Да' : 'Нет')}</span>${richText(trimmed.slice(answer[0].length))}`;
   }
 
-  function generalComparison(section) {
-    const available = section.items.filter(item => item.t === 'card'
+  function generalComparison(section, general) {
+    const cards = section.items.filter(item => item.t === 'card');
+    const groups = [...new Set(cards.map(item => item.g).filter(Boolean))];
+    if (groups.length && !groups.includes(general.group)) general.group = groups[0];
+    const available = cards.filter(item => (!groups.length || item.g === general.group)
       && (!state.banks.size || item.b.some(id => state.banks.has(id))));
-    const byId = new Map(available.map(item => [item.b[0] ?? item.n, item]));
-    const filterKey = [...state.banks].sort().join(',');
+    const bankCounts = new Map();
+    for (const { b } of available) bankCounts.set(b[0], (bankCounts.get(b[0]) ?? 0) + 1);
+    const byId = new Map(available.map((item, index) => {
+      const bank = item.b[0];
+      return [bank && bankCounts.get(bank) === 1 ? bank : `card-${index}`, item];
+    }));
+    const filterKey = JSON.stringify([general.group, [...state.banks].sort()]);
     if (general.filterKey !== filterKey) {
       const defaults = [...byId.keys()].slice(0, state.banks.size ? 3 : 2);
       general.banks = Array.from({ length: 3 }, (_, index) => defaults[index] ?? '');
@@ -482,6 +492,10 @@ function initMemo({ secs, groups, banks }) {
         ).join('')}</select></label>`).join('');
     const conditionOptions = [...labels].map(([id, label]) =>
       `<option value="${esc(id)}"${general.condition === id ? ' selected' : ''}>${esc(label.replace(/\s+/g, ' '))}</option>`).join('');
+    const groupPicker = groups.length > 1 ? `<div class="compare-object"><label for="compare-group">
+      Тип объекта<select id="compare-group">${groups.map(group =>
+        `<option value="${esc(group)}"${general.group === group ? ' selected' : ''}>${esc(group)}</option>`).join('')}
+      </select></label></div>` : '';
     const cell = (entry, label) => {
       const [, text, note] = entry ?? [];
       return (text && !isEmpty(text) ? generalValue(text) : '<span class="compare-missing">Не указано</span>') + cellNote(note, label);
@@ -497,7 +511,7 @@ function initMemo({ secs, groups, banks }) {
           <table><thead><tr><th scope="col">Условие</th>${head}</tr></thead><tbody>${tableRows}</tbody></table></div>
         <div class="loyalty-rows compare-rows">${compact}</div>`
       : `<p class="empty">${!selected.length ? 'Выберите банки для сравнения.' : 'Нет условий, подходящих под выбранные фильтры.'}</p>`;
-    return `<div class="general-compare"><div class="compare-banks">${bankOptions}</div>
+    return `<div class="general-compare">${groupPicker}<div class="compare-banks">${bankOptions}</div>
       <div class="compare-options"><label for="compare-condition">Условие<select id="compare-condition">
         <option value="">Все условия</option>${conditionOptions}</select></label>
         <label class="compare-differences"><input id="compare-differences" type="checkbox"
@@ -505,10 +519,10 @@ function initMemo({ secs, groups, banks }) {
       ${comparison}</div>`;
   }
 
-  function generalConditions(section, result) {
+  function generalConditions(section, result, general) {
     const tabs = [['list', 'По банкам'], ['compare', 'Сравнить банки']].map(([id, label]) =>
       `<button type="button" id="general-${id}" data-general-view="${id}" aria-pressed="${general.view === id}">${label}</button>`).join('');
-    const content = general.view === 'compare' ? generalComparison(section) : result.items.length
+    const content = general.view === 'compare' ? generalComparison(section, general) : result.items.length
       ? `<div class="cards">${result.items.map(item => card(item, { renderValue: generalValue })).join('')}</div>`
       : '<p class="empty">Попробуйте изменить поиск или фильтр по банкам.</p>';
     return `<div class="general-views" role="group" aria-label="Вид общих условий">${tabs}</div>${content}`;
@@ -911,7 +925,7 @@ function initMemo({ secs, groups, banks }) {
       return `<option value="${esc(item.id)}"${item.id === section.id ? ' selected' : ''}>${esc(item.t)}</option>`;
     }
     let contents = '';
-    if (section.id === 's0') contents = generalConditions(section, result);
+    if (comparisons.has(section.id)) contents = generalConditions(section, result, comparisons.get(section.id));
     else if (section.id === 's9') contents = standardSubsidyView(section, result);
     else if (familySubsidy(section)) contents = groupedFamilySubsidyView(result);
     else if (section.id === 's3' && result.choices && result.count) contents = familyConditionsView(result);
@@ -1008,16 +1022,22 @@ function initMemo({ secs, groups, banks }) {
   });
   app.addEventListener('click', event => {
     const button = event.target.closest('[data-general-view]');
-    if (!button) return;
+    const general = comparisons.get(location.hash.slice(1));
+    if (!button || !general) return;
     general.view = button.dataset.generalView;
     render();
     document.getElementById(button.id).focus({ preventScroll: true });
   });
   app.addEventListener('change', event => {
     const { id, value, checked, dataset } = event.target;
-    if (dataset.compareBank !== undefined || id === 'compare-condition' || id === 'compare-differences') {
+    const general = comparisons.get(location.hash.slice(1));
+    if (general && (dataset.compareBank !== undefined || id.startsWith('compare-'))) {
       if (dataset.compareBank !== undefined) general.banks[Number(dataset.compareBank)] = value;
       else if (id === 'compare-condition') general.condition = value;
+      else if (id === 'compare-group') {
+        general.group = value;
+        general.condition = '';
+      }
       else general.differences = checked;
       render();
       document.getElementById(id)?.focus({ preventScroll: true });
